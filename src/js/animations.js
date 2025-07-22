@@ -76,9 +76,111 @@ class LoadingAnimation {
     }
 
     startEntranceAnimations() {
-        // Initialize entrance animations
-        const entranceAnimations = new EntranceAnimations();
-        entranceAnimations.init();
+        // Check if we're on a work detail page
+        const isWorkPage = document.querySelector('.work-detail-page');
+
+        if (isWorkPage) {
+            // Initialize work page specific animations
+            const workAnimations = new WorkPageAnimations();
+            workAnimations.init();
+        } else {
+            // Initialize regular entrance animations
+            const entranceAnimations = new EntranceAnimations();
+            entranceAnimations.init();
+        }
+    }
+}
+
+// Work Page Animations Controller
+class WorkPageAnimations {
+    constructor() {
+        this.heroSection = document.querySelector('.work-hero-fullscreen');
+        this.heroCover = document.querySelector('.work-hero-cover');
+        this.heroOverlay = document.querySelector('.work-hero-overlay');
+        this.nav = document.querySelector('.nav');
+        this.timeline = gsap.timeline();
+    }
+
+    init() {
+        console.log("Starting work page entrance animations");
+        this.createWorkPageSequence();
+    }
+
+    createWorkPageSequence() {
+        // First animate the navigation
+        this.timeline.to(this.nav, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        }, 0);
+
+        // Animate the color cover sliding up to reveal the image
+        if (this.heroCover) {
+            this.timeline.to(this.heroCover, {
+                y: "-100%",
+                duration: 1.2,
+                ease: "power2.inOut"
+            }, 0.3);
+        }
+
+        // Fade in the hero overlay content after the cover animation
+        if (this.heroOverlay) {
+            this.timeline.to(this.heroOverlay, {
+                opacity: 1,
+                duration: 0.8,
+                ease: "power2.out"
+            }, 1.0);
+        }
+
+        // Animate other page elements
+        this.timeline.to('.work-info-section', {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        }, 1.2);
+
+        this.timeline.to('.work-content-section', {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out"
+        }, 1.4);
+
+        this.timeline.to('.footer', {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out"
+        }, 1.6);
+
+        // Setup scroll animations for work page
+        this.setupWorkPageScrollAnimations();
+    }
+
+    setupWorkPageScrollAnimations() {
+        // Register ScrollTrigger plugin
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate work content elements when they come into view
+        gsap.utils.toArray('.work-article h1, .work-article h2, .work-article h3, .work-article p, .work-article img').forEach((element) => {
+            gsap.fromTo(element, {
+                opacity: 0,
+                y: 30
+            }, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 90%",
+                    end: "bottom 10%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
     }
 }
 
@@ -313,6 +415,7 @@ function setupThemeAnimations() {
 window.AnimationController = {
     LoadingAnimation,
     EntranceAnimations,
+    WorkPageAnimations,
     ParticleIntegration
 };
 
