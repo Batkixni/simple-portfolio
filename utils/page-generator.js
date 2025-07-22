@@ -27,7 +27,7 @@ class PageGenerator {
     let result = template;
 
     // 基本替換
-    Object.keys(data).forEach(key => {
+    Object.keys(data).forEach((key) => {
       const value = data[key] || "";
       const regex = new RegExp(`{{${key}}}`, "g");
       result = result.replace(regex, value);
@@ -49,8 +49,13 @@ class PageGenerator {
 
     // 處理標籤
     if (data.tags && data.tags.length > 0) {
-      const tagsHtml = data.tags.map(tag => `<span class="work-tag">${tag}</span>`).join("");
-      result = result.replace(/{{#tags}}([\s\S]*?){{\/tags}}/g, `<div class="work-tags">${tagsHtml}</div>`);
+      const tagsHtml = data.tags
+        .map((tag) => `<span class="work-tag">${tag}</span>`)
+        .join("");
+      result = result.replace(
+        /{{#tags}}([\s\S]*?){{\/tags}}/g,
+        `<div class="work-tags">${tagsHtml}</div>`,
+      );
     } else {
       result = result.replace(/{{#tags}}([\s\S]*?){{\/tags}}/g, "");
     }
@@ -72,7 +77,7 @@ class PageGenerator {
 
       if (stat.isDirectory()) {
         const files = await fs.readdir(categoryPath);
-        const mdFiles = files.filter(file => file.endsWith(".md"));
+        const mdFiles = files.filter((file) => file.endsWith(".md"));
 
         for (const file of mdFiles) {
           const filePath = path.join(categoryPath, file);
@@ -91,7 +96,7 @@ class PageGenerator {
             date: parsed.attributes.date || "",
             tags: parsed.attributes.tags || [],
             content: marked.parse(parsed.body),
-            filePath: filePath
+            filePath: filePath,
           };
 
           allWorks.push(work);
@@ -104,8 +109,8 @@ class PageGenerator {
 
   getCategoryDisplay(category) {
     const categoryMap = {
-      "graphic-design": "平面設計",
-      "motion-design": "動態設計"
+      "graphic-design": "Visual Designs",
+      "motion-design": "Motion Designs",
     };
     return categoryMap[category] || category;
   }
@@ -118,7 +123,7 @@ class PageGenerator {
       category: work.categoryDisplay,
       date: work.date ? new Date(work.date).toLocaleDateString("zh-TW") : "",
       tags: work.tags,
-      content: work.content
+      content: work.content,
     };
 
     const html = this.replaceTemplate(this.template, data);
@@ -148,7 +153,7 @@ class PageGenerator {
         const outputPath = await this.generateWorkPage(work);
         generatedPages.push({
           work: work,
-          path: outputPath
+          path: outputPath,
         });
         console.log(`✓ 已生成: ${work.title} -> ${outputPath}`);
       } catch (error) {
@@ -164,7 +169,11 @@ class PageGenerator {
     const missingPages = [];
 
     for (const work of works) {
-      const expectedPath = path.join(this.outputDir, "work", `${work.path}.html`);
+      const expectedPath = path.join(
+        this.outputDir,
+        "work",
+        `${work.path}.html`,
+      );
       const exists = await fs.pathExists(expectedPath);
 
       if (!exists) {
@@ -204,7 +213,7 @@ class PageGenerator {
         const outputPath = await this.generateWorkPage(work);
         generatedPages.push({
           work: work,
-          path: outputPath
+          path: outputPath,
         });
         console.log(`✓ 已生成/更新: ${work.title}`);
       } catch (error) {
