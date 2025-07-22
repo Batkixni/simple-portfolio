@@ -10,11 +10,26 @@ class LoadingAnimation {
         this.loadingText = document.querySelector('.loading-text');
         this.progress = 0;
         this.isComplete = false;
+        this.shouldSkipLoading = false;
 
+        this.checkTransitionManager();
         this.init();
     }
 
+    checkTransitionManager() {
+        // 檢查是否有轉場管理器，並且是否應該跳過載入動畫
+        if (window.transitionManager && window.transitionManager.isFromHomepage) {
+            this.shouldSkipLoading = true;
+        }
+    }
+
     init() {
+        if (this.shouldSkipLoading) {
+            // 如果應該跳過載入動畫，立即隱藏載入畫面
+            this.skipLoadingAnimation();
+            return;
+        }
+
         // Animate loading logo in
         gsap.to(this.loadingLogo, {
             opacity: 1,
@@ -35,6 +50,13 @@ class LoadingAnimation {
 
         // Start progress animation
         this.startProgress();
+    }
+
+    skipLoadingAnimation() {
+        console.log("Skipping loading animation - smooth transition from homepage");
+        this.loadingScreen.style.display = 'none';
+        this.isComplete = true;
+        this.startEntranceAnimations();
     }
 
     startProgress() {
@@ -379,15 +401,40 @@ class ParticleIntegration {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM loaded, starting animations");
 
-    // Start loading animation
-    const loading = new LoadingAnimation();
+    // 等待轉場管理器初始化完成
+    const initializeAnimations = () => {
+        // Start loading animation
+        const loading = new LoadingAnimation();
 
-    // Initialize particle integration
-    const particles = new ParticleIntegration();
-    particles.init();
+        // Initialize particle integration
+        const particles = new ParticleIntegration();
+        particles.init();
 
-    // Setup theme change animations
-    setupThemeAnimations();
+        // Setup theme change animations
+        setupThemeAnimations();
+    };
+
+    // 如果轉場管理器已經存在，立即初始化
+    if (window.transitionManager) {
+        initializeAnimations();
+    } else {
+        // 否則等待轉場管理器載入
+        const waitForTransitionManager = setInterval(() => {
+            if (window.transitionManager) {
+                clearInterval(waitForTransitionManager);
+                initializeAnimations();
+            }
+        }, 10);
+
+        // 設置超時，避免無限等待
+        setTimeout(() => {
+            clearInterval(waitForTransitionManager);
+            if (!window.transitionManager) {
+                console.log("Transition manager not found, proceeding with normal initialization");
+                initializeAnimations();
+            }
+        }, 1000);
+    }
 });
 
 // Theme change animations

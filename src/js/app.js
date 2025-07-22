@@ -178,6 +178,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // 處理導航連結，特別是帶有錨點的連結
   document.addEventListener("click", function (e) {
+    // 處理作品項目點擊
+    const portfolioItem = e.target.closest('.portfolio-item');
+    if (portfolioItem) {
+      const workLink = portfolioItem.querySelector('a');
+      if (workLink) {
+        // 設置內部導航標記
+        sessionStorage.setItem('internalNavigation', 'true');
+        // 如果有轉場管理器，讓它處理轉場
+        if (window.transitionManager && window.transitionManager.isHomepage()) {
+          sessionStorage.setItem('fromHomepage', 'true');
+        }
+      }
+      return; // 讓轉場管理器處理作品項目的導航
+    }
+
+    // 處理所有內部連結點擊
+    const link = e.target.closest('a');
+    if (link && link.href) {
+      const href = link.getAttribute('href');
+      // 檢查是否為內部連結
+      if (href && (href.startsWith('/') || href.startsWith('./') || href.startsWith('../') ||
+          (!href.startsWith('http') && !href.startsWith('mailto:') && !href.startsWith('tel:')))) {
+        sessionStorage.setItem('internalNavigation', 'true');
+      }
+    }
+
     // 處理回到首頁的錨點連結
     if (e.target.matches('a[href^="/#"]')) {
       const hash = e.target.getAttribute("href").substring(1);
@@ -208,6 +234,21 @@ document.addEventListener("htmx:beforeRequest", function (e) {
 document.addEventListener("htmx:responseError", function (e) {
   console.error("HTMX Request Error:", e.detail);
   e.target.innerHTML = '<div class="loading">載入失敗，請重新整理頁面</div>';
+});
+
+// HTMX載入完成後，為新載入的作品項目添加轉場支持
+document.addEventListener("htmx:afterRequest", function (e) {
+  if (e.target.classList.contains("portfolio-grid")) {
+    // 為新載入的作品項目添加轉場標記
+    const portfolioItems = e.target.querySelectorAll('.portfolio-item');
+    portfolioItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (window.transitionManager && window.transitionManager.isHomepage()) {
+          sessionStorage.setItem('fromHomepage', 'true');
+        }
+      });
+    });
+  }
 });
 
 // Add smooth scrolling for mouse wheel with better responsiveness
