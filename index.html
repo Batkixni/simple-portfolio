@@ -11,6 +11,19 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
     </head>
     <body>
+        <!-- Loading Screen -->
+        <div id="loading-screen">
+            <div class="loading-content">
+                <div class="loading-logo">
+                    <h1>Bax</h1>
+                </div>
+                <div class="loading-progress">
+                    <div class="progress-bar"></div>
+                </div>
+                <p class="loading-text">Loading...</p>
+            </div>
+        </div>
+
         <!-- Background Canvas -->
         <div id="canvas-container"></div>
 
@@ -19,7 +32,7 @@
         <div class="cursor-follower"></div>
 
         <!-- Navigation -->
-        <nav class="nav">
+        <nav class="nav animate-element">
             <div class="nav-brand">
                 <h1>Bax</h1>
             </div>
@@ -43,9 +56,9 @@
         <!-- Main Content -->
         <main class="main">
             <!-- Hero Section -->
-            <section class="hero">
-                <h1 class="hero-title">Bax show</h1>
-                <p class="hero-subtitle">
+            <section class="hero animate-element">
+                <h1 class="hero-title animate-element">Bax show</h1>
+                <p class="hero-subtitle animate-element">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
                     do eiusmod tempor incididunt ut labore et dolore magna
                     aliqua. Ut enim ad minim veniam, quis nostrud exercitation
@@ -54,13 +67,13 @@
             </section>
 
             <!-- Works Main Title -->
-            <section class="works-header">
-                <h2 class="works-main-title">WORKS</h2>
+            <section class="works-header animate-element">
+                <h2 class="works-main-title animate-element">WORKS</h2>
             </section>
 
             <!-- Motion Design Section -->
-            <section id="motion" class="portfolio-section">
-                <h2 class="section-title">Motion Design</h2>
+            <section id="motion" class="portfolio-section animate-element">
+                <h2 class="section-title animate-element">Motion Design</h2>
                 <div
                     class="portfolio-grid"
                     id="motion-grid"
@@ -73,8 +86,8 @@
 
                     <!-- Fallback static content for testing -->
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -90,8 +103,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -107,8 +120,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -124,8 +137,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -141,8 +154,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -158,8 +171,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -177,8 +190,8 @@
             </section>
 
             <!-- Graphic Design Section -->
-            <section id="graphic" class="portfolio-section">
-                <h2 class="section-title">Graphic Design</h2>
+            <section id="graphic" class="portfolio-section animate-element">
+                <h2 class="section-title animate-element">Graphic Design</h2>
                 <div
                     class="portfolio-grid"
                     id="graphic-grid"
@@ -191,8 +204,8 @@
 
                     <!-- Fallback static content for testing -->
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -208,8 +221,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -225,8 +238,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -242,8 +255,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -259,8 +272,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -276,8 +289,8 @@
                     </div>
 
                     <div
-                        class="portfolio-item"
-                        style="opacity: 1; transform: translateY(0)"
+                        class="portfolio-item animate-element"
+                        style="opacity: 0; transform: translateY(30px)"
                     >
                         <div class="portfolio-image">
                             <img
@@ -296,7 +309,7 @@
         </main>
 
         <!-- Footer -->
-        <footer class="footer">
+        <footer class="footer animate-element">
             <div class="footer-content">
                 <p>&copy; 2024 Bax. All rights reserved.</p>
                 <div class="footer-links">
@@ -318,6 +331,7 @@
             </div>
         </div>
 
+        <script src="src/js/animations.js"></script>
         <script src="src/js/app.js"></script>
         <script src="src/js/particles.js"></script>
     </body>
