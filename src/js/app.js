@@ -1,435 +1,214 @@
-// Theme Management
-const themeToggle = document.getElementById("theme-toggle");
-const themeIcon = document.querySelector(".theme-icon");
-const htmlElement = document.documentElement;
+// 簡化版本 - 使用CSS類控制cursor效果
+console.log("App.js loaded");
 
-// Initialize theme
-function initTheme() {
-  const savedTheme = localStorage.getItem("theme") || "dark";
-  setTheme(savedTheme);
+// 全局變量
+let cursor = null;
+let cursorFollower = null;
+let mouseX = 0;
+let mouseY = 0;
+let followerX = 0;
+let followerY = 0;
+
+// 平滑跟隨動畫函數
+function animateFollower() {
+  const diffX = mouseX - followerX;
+  const diffY = mouseY - followerY;
+
+  followerX += diffX * 0.1; // 調整跟隨速度
+  followerY += diffY * 0.1;
+
+  if (cursorFollower) {
+    cursorFollower.style.left = followerX - 20 + "px";
+    cursorFollower.style.top = followerY - 20 + "px";
+  }
+
+  requestAnimationFrame(animateFollower);
 }
 
-// Set theme
-function setTheme(theme) {
-  htmlElement.setAttribute("data-theme", theme);
-  localStorage.setItem("theme", theme);
+// 等待頁面完全載入
+window.addEventListener("load", function () {
+  console.log("Window loaded");
 
-  // Update icon
-  if (themeIcon) {
-    themeIcon.textContent = theme === "dark" ? "🌙" : "☀️";
+  // 初始化cursor
+  cursor = document.querySelector(".cursor");
+  cursorFollower = document.querySelector(".cursor-follower");
+
+  console.log("Cursor elements:", cursor, cursorFollower);
+
+  if (cursor && cursorFollower) {
+    console.log("Cursor elements found, setting up mouse listener");
+
+    // 啟動跟隨動畫
+    animateFollower();
+
+    // 滑鼠移動事件
+    document.addEventListener("mousemove", function (e) {
+      if (window.innerWidth > 768) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        // 主cursor即時跟隨
+        cursor.style.left = e.clientX - 10 + "px";
+        cursor.style.top = e.clientY - 10 + "px";
+      }
+    });
+
+    // Hover效果 - 使用CSS類
+    document.addEventListener("mouseover", function (e) {
+      // 作品項目
+      if (e.target.closest(".portfolio-item")) {
+        cursor.className = "cursor hover-item";
+        cursorFollower.className = "cursor-follower hover-item";
+      }
+      // 導航連結
+      else if (e.target.matches(".nav-link")) {
+        cursor.className = "cursor hover-link";
+        cursorFollower.className = "cursor-follower hover-link";
+      }
+      // 按鈕和其他可點擊元素
+      else if (
+        e.target.matches(
+          "a, button, .modal-close, .portfolio-link, .theme-toggle",
+        )
+      ) {
+        cursor.className = "cursor hover-button";
+        cursorFollower.className = "cursor-follower hover-button";
+      }
+      // 文字元素
+      else if (
+        e.target.matches(
+          "h1, h2, h3, h4, h5, h6, p, .hero-title, .hero-subtitle, .section-title",
+        )
+      ) {
+        cursor.className = "cursor hover-text";
+        cursorFollower.className = "cursor-follower hover-text";
+      }
+    });
+
+    // 移出hover效果
+    document.addEventListener("mouseout", function (e) {
+      if (
+        e.target.closest(".portfolio-item") ||
+        e.target.matches(
+          "a, button, .nav-link, .modal-close, .portfolio-link, .theme-toggle",
+        ) ||
+        e.target.matches(
+          "h1, h2, h3, h4, h5, h6, p, .hero-title, .hero-subtitle, .section-title",
+        )
+      ) {
+        cursor.className = "cursor";
+        cursorFollower.className = "cursor-follower";
+      }
+    });
+
+    console.log("Mouse move listener added");
+  } else {
+    console.error("Cursor elements not found!");
   }
-}
 
-// Toggle theme
-function toggleTheme() {
-  const currentTheme = htmlElement.getAttribute("data-theme") || "dark";
-  const newTheme = currentTheme === "dark" ? "light" : "dark";
-  setTheme(newTheme);
+  // 主題切換
+  const themeToggle = document.getElementById("theme-toggle");
+  const themeIcon = document.querySelector(".theme-icon");
 
-  // Update cursor colors after theme change
-  setTimeout(updateCursorColors, 50);
-}
+  if (themeToggle && themeIcon) {
+    themeToggle.addEventListener("click", function () {
+      const currentTheme =
+        document.documentElement.getAttribute("data-theme") || "dark";
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
 
-// Theme toggle event listener
-if (themeToggle) {
-  themeToggle.addEventListener("click", toggleTheme);
-}
+      document.documentElement.setAttribute("data-theme", newTheme);
+      themeIcon.textContent = newTheme === "light" ? "🌙" : "☀️";
+      localStorage.setItem("theme", newTheme);
 
-// Initialize theme on page load
-initTheme();
-
-// Update cursor colors after theme initialization
-function updateCursorColors() {
-  if (cursor && cursorFollower && window.innerWidth > 768) {
-    const cursorColor = getComputedStyle(document.documentElement)
-      .getPropertyValue("--cursor-color")
-      .trim();
-
-    gsap.set(cursor, { backgroundColor: cursorColor });
-    gsap.set(cursorFollower, { borderColor: cursorColor });
-  }
-}
-
-// Call after theme initialization
-updateCursorColors();
-
-// Custom Cursor
-let cursor = document.querySelector(".cursor");
-let cursorFollower = document.querySelector(".cursor-follower");
-
-// Update cursor position
-document.addEventListener("mousemove", (e) => {
-  if (window.innerWidth > 768) {
-    gsap.to(cursor, {
-      left: e.clientX,
-      top: e.clientY,
-      duration: 0.5,
-      ease: "power2.out",
+      console.log("Theme switched to:", newTheme);
     });
 
-    gsap.to(cursorFollower, {
-      left: e.clientX,
-      top: e.clientY,
-      duration: 0.8,
-      ease: "power2.out",
-    });
-  }
-});
-
-// Cursor hover effects
-document.addEventListener("mouseover", (e) => {
-  // Portfolio items - bigger scale
-  if (e.target.closest(".portfolio-item")) {
-    gsap.to(cursor, {
-      scale: 2.5,
-      duration: 0.4,
-      ease: "back.out(1.7)",
-    });
-    gsap.to(cursorFollower, {
-      scale: 2,
-      duration: 0.5,
-      ease: "power2.out",
-    });
-  }
-  // Navigation links - medium scale
-  else if (e.target.matches(".nav-link")) {
-    gsap.to(cursor, {
-      scale: 1.7,
-      duration: 0.3,
-      ease: "back.out(1.7)",
-    });
-    gsap.to(cursorFollower, {
-      scale: 1.5,
-      duration: 0.4,
-      ease: "power2.out",
-    });
-  }
-  // Other interactive elements - small scale
-  else if (e.target.matches("a, button, .modal-close, .portfolio-link")) {
-    gsap.to(cursor, {
-      scale: 1.3,
-      duration: 0.3,
-      ease: "back.out(1.7)",
-    });
-    gsap.to(cursorFollower, {
-      scale: 1.1,
-      duration: 0.4,
-      ease: "power2.out",
-    });
+    // 初始化主題
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    themeIcon.textContent = savedTheme === "light" ? "🌙" : "☀️";
   }
 });
 
-document.addEventListener("mouseout", (e) => {
-  if (
-    e.target.closest(".portfolio-item") ||
-    e.target.matches("a, button, .nav-link, .modal-close, .portfolio-link")
-  ) {
-    gsap.to(cursor, {
-      scale: 1,
-      duration: 0.3,
-      ease: "power2.out",
+// 導航連結功能
+document.addEventListener("DOMContentLoaded", function () {
+  // 導航連結平滑滾動
+  document.querySelectorAll(".nav-link").forEach(function (link) {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      const targetId = link.getAttribute("href");
+      const targetElement = document.querySelector(targetId);
+
+      if (targetElement) {
+        targetElement.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     });
-    gsap.to(cursorFollower, {
-      scale: 1,
-      duration: 0.4,
-      ease: "power2.out",
-    });
-  }
-});
-
-// Text hover effect
-document.addEventListener("mouseover", (e) => {
-  if (
-    e.target.matches(
-      "h1, h2, h3, h4, h5, h6, p, .hero-title, .hero-subtitle, .section-title",
-    )
-  ) {
-    const cursorColor = getComputedStyle(document.documentElement)
-      .getPropertyValue("--cursor-color")
-      .trim();
-
-    gsap.to(cursor, {
-      scale: 0.7,
-      backgroundColor: cursorColor,
-      duration: 0.3,
-      ease: "power2.out",
-    });
-    gsap.to(cursorFollower, {
-      scale: 1.5,
-      borderWidth: 2,
-      duration: 0.4,
-      ease: "power2.out",
-    });
-  }
-});
-
-document.addEventListener("mouseout", (e) => {
-  if (
-    e.target.matches(
-      "h1, h2, h3, h4, h5, h6, p, .hero-title, .hero-subtitle, .section-title",
-    )
-  ) {
-    const cursorColor = getComputedStyle(document.documentElement)
-      .getPropertyValue("--cursor-color")
-      .trim();
-
-    gsap.to(cursor, {
-      scale: 1,
-      backgroundColor: cursorColor,
-      duration: 0.3,
-      ease: "power2.out",
-    });
-    gsap.to(cursorFollower, {
-      scale: 1,
-      borderWidth: 1,
-      duration: 0.4,
-      ease: "power2.out",
-    });
-  }
-});
-
-// Initial page load animations
-gsap
-  .timeline()
-  .to(".hero-title", {
-    opacity: 1,
-    y: 0,
-    duration: 1,
-    ease: "power2.out",
-  })
-  .to(
-    ".hero-subtitle",
-    {
-      opacity: 1,
-      y: 0,
-      duration: 1,
-      ease: "power2.out",
-    },
-    "-=0.5",
-  );
-
-// Section titles animation on scroll
-gsap.registerPlugin(ScrollTrigger);
-
-gsap.utils.toArray(".section-title").forEach((title) => {
-  gsap.fromTo(
-    title,
-    {
-      opacity: 0,
-      y: 50,
-    },
-    {
-      opacity: 1,
-      y: 0,
-      duration: 1,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: title,
-        start: "top 80%",
-        toggleActions: "play none none reverse",
-      },
-    },
-  );
-});
-
-// Portfolio items stagger animation
-function animatePortfolioItems() {
-  gsap.utils.toArray(".portfolio-item").forEach((item, index) => {
-    gsap.fromTo(
-      item,
-      {
-        opacity: 0,
-        y: 50,
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        delay: index * 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: item,
-          start: "top 85%",
-          toggleActions: "play none none reverse",
-        },
-      },
-    );
   });
-}
 
-// Smooth scroll for navigation links
-document.querySelectorAll(".nav-link").forEach((link) => {
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-    const targetId = link.getAttribute("href");
-    const targetElement = document.querySelector(targetId);
+  // 模態框功能
+  function openModal(workPath) {
+    const modal = document.getElementById("work-modal");
+    if (modal) {
+      modal.style.display = "block";
+      modal.style.opacity = "0";
 
-    if (targetElement) {
-      gsap.to(window, {
-        scrollTo: {
-          y: targetElement.offsetTop - 100,
-          autoKill: false,
-        },
-        duration: 1,
-        ease: "power2.inOut",
-      });
+      setTimeout(() => {
+        modal.style.opacity = "1";
+      }, 10);
+
+      document.body.style.overflow = "hidden";
+    }
+  }
+
+  function closeModal() {
+    const modal = document.getElementById("work-modal");
+    if (modal) {
+      modal.style.opacity = "0";
+      setTimeout(() => {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto";
+      }, 300);
+    }
+  }
+
+  // 模態框事件監聽
+  document.addEventListener("click", function (e) {
+    if (
+      e.target.classList.contains("modal-close") ||
+      e.target.classList.contains("modal")
+    ) {
+      closeModal();
+    }
+
+    // 作品項目點擊
+    if (e.target.closest(".portfolio-item")) {
+      const workPath = e.target.closest(".portfolio-item").dataset.work;
+      if (workPath) {
+        openModal(workPath);
+      }
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      closeModal();
     }
   });
 });
 
-// Modal functionality
-function openModal(workPath) {
-  const modal = document.getElementById("work-modal");
-  const modalBody = document.getElementById("modal-body");
-
-  // Show modal with animation
-  gsap.set(modal, { display: "block" });
-  gsap.fromTo(
-    modal,
-    {
-      opacity: 0,
-    },
-    {
-      opacity: 1,
-      duration: 0.3,
-    },
-  );
-
-  gsap.fromTo(
-    ".modal-content",
-    {
-      scale: 0.8,
-      y: 50,
-    },
-    {
-      scale: 1,
-      y: 0,
-      duration: 0.4,
-      ease: "power2.out",
-    },
-  );
-
-  // Load work content via HTMX
-  htmx.ajax("GET", `/api/work/${workPath}`, {
-    target: "#modal-body",
-  });
-
-  // Prevent body scroll
-  document.body.style.overflow = "hidden";
-}
-
-function closeModal() {
-  const modal = document.getElementById("work-modal");
-
-  gsap.to(modal, {
-    opacity: 0,
-    duration: 0.3,
-    onComplete: () => {
-      modal.style.display = "none";
-      document.body.style.overflow = "auto";
-    },
-  });
-}
-
-// Modal event listeners
-document.addEventListener("click", (e) => {
-  if (
-    e.target.classList.contains("modal-close") ||
-    e.target.classList.contains("modal")
-  ) {
-    closeModal();
-  }
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeModal();
-  }
-});
-
-// Handle portfolio item clicks
-document.addEventListener("click", (e) => {
-  if (e.target.closest(".portfolio-item")) {
-    const workPath = e.target.closest(".portfolio-item").dataset.work;
-    if (workPath) {
-      openModal(workPath);
-    }
-  }
-});
-
-// HTMX event listeners
-document.addEventListener("htmx:afterSwap", (e) => {
-  // Re-animate portfolio items after HTMX loads content
-  if (e.target.classList.contains("portfolio-grid")) {
-    animatePortfolioItems();
-  }
-});
-
-// Parallax effect for hero section
-gsap.to(".hero-title", {
-  yPercent: -50,
-  ease: "none",
-  scrollTrigger: {
-    trigger: ".hero",
-    start: "top bottom",
-    end: "bottom top",
-    scrub: true,
-  },
-});
-
-gsap.to(".hero-subtitle", {
-  yPercent: -30,
-  ease: "none",
-  scrollTrigger: {
-    trigger: ".hero",
-    start: "top bottom",
-    end: "bottom top",
-    scrub: true,
-  },
-});
-
-// Navigation background opacity on scroll with theme-aware colors
-function updateNavBackground() {
-  const currentTheme = htmlElement.getAttribute("data-theme") || "dark";
-  const navBgColor =
-    currentTheme === "dark"
-      ? "rgba(0, 0, 0, 0.98)"
-      : "rgba(255, 255, 255, 0.98)";
-
-  gsap.to(".nav", {
-    backgroundColor: navBgColor,
-    ease: "none",
-    scrollTrigger: {
-      trigger: "body",
-      start: "top -50px",
-      end: "bottom bottom",
-      toggleActions: "play none none reverse",
-    },
-  });
-}
-
-// Update navigation background on theme change
-updateNavBackground();
-
-// Listen for theme changes to update scroll trigger
-themeToggle?.addEventListener("click", () => {
-  setTimeout(updateNavBackground, 100);
-});
-
-// Loading state management
-document.addEventListener("htmx:beforeRequest", (e) => {
+// HTMX事件處理
+document.addEventListener("htmx:beforeRequest", function (e) {
   if (e.target.classList.contains("portfolio-grid")) {
     e.target.innerHTML = '<div class="loading">載入中...</div>';
   }
 });
 
-// Error handling
-document.addEventListener("htmx:responseError", (e) => {
+document.addEventListener("htmx:responseError", function (e) {
   console.error("HTMX Request Error:", e.detail);
   e.target.innerHTML = '<div class="loading">載入失敗，請重新整理頁面</div>';
 });
 
-// Initialize ScrollTrigger refresh on window resize
-window.addEventListener("resize", () => {
-  ScrollTrigger.refresh();
-});
+console.log("App.js setup complete");

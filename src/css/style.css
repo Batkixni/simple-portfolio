@@ -9,32 +9,37 @@ html {
     scroll-behavior: smooth;
 }
 
+/* CSS Variables for Theme System */
 :root {
-    /* Light theme variables */
-    --bg-color: #ffffff;
-    --text-color: #000000;
-    --card-bg: #f8f9fa;
-    --border-color: #e0e0e0;
-    --nav-bg: rgba(255, 255, 255, 0.95);
-    --modal-bg: rgba(0, 0, 0, 0.8);
-    --modal-content-bg: #ffffff;
-    --hover-border: #333333;
-    --cursor-color: #000000;
-    --loading-opacity: 0.6;
-}
-
-[data-theme="dark"] {
-    /* Dark theme variables */
+    /* Dark theme (default) */
     --bg-color: #000000;
     --text-color: #ffffff;
     --card-bg: #111111;
     --border-color: #333333;
-    --nav-bg: rgba(0, 0, 0, 0.95);
+    --nav-bg: rgba(0, 0, 0, 0.6);
     --modal-bg: rgba(0, 0, 0, 0.95);
     --modal-content-bg: #111111;
     --hover-border: #ffffff;
     --cursor-color: #ffffff;
     --loading-opacity: 0.5;
+    --shadow: rgba(255, 255, 255, 0.1);
+    --hover-shadow: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] {
+    /* Light theme */
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --card-bg: #f8f9fa;
+    --border-color: #e0e0e0;
+    --nav-bg: rgba(255, 255, 255, 0.8);
+    --modal-bg: rgba(0, 0, 0, 0.8);
+    --modal-content-bg: #ffffff;
+    --hover-border: #333333;
+    --cursor-color: #000000;
+    --loading-opacity: 0.6;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --hover-shadow: rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -43,10 +48,14 @@ body {
     color: var(--text-color);
     line-height: 1.4;
     overflow-x: hidden;
+    overflow-y: auto;
     cursor: none;
     transition:
         background-color 0.3s ease,
         color 0.3s ease;
+    padding-bottom: 120px; /* Space for bottom nav */
+    min-height: 100vh;
+    position: relative;
 }
 
 /* Custom Cursor */
@@ -59,8 +68,14 @@ body {
     pointer-events: none;
     z-index: 9999;
     mix-blend-mode: difference;
-    transition: transform 0.5s easeInOutSine;
-    transform: translate(-50%, -50%);
+    transition:
+        background-color 0.3s ease,
+        transform 0.5s ease,
+        width 0.3s ease,
+        height 0.3s ease;
+    left: -10px;
+    top: -10px;
+    transform: translate(0, 0);
 }
 
 .cursor-follower {
@@ -71,25 +86,71 @@ body {
     border-radius: 50%;
     pointer-events: none;
     z-index: 9998;
-    transition: all 1s easeInOutSine;
+    transition:
+        border-color 0.3s ease,
+        transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        width 0.3s ease,
+        height 0.3s ease,
+        border-width 0.3s ease;
     opacity: 0.5;
-    transform: translate(-50%, -50%);
+    left: -20px;
+    top: -20px;
+    transform: translate(0, 0);
 }
 
-/* Navigation */
+/* Cursor hover states */
+.cursor.hover-item {
+    transform: scale(2.5);
+}
+
+.cursor-follower.hover-item {
+    transform: scale(2);
+}
+
+.cursor.hover-link {
+    transform: scale(1.7);
+}
+
+.cursor-follower.hover-link {
+    transform: scale(1.5);
+}
+
+.cursor.hover-button {
+    transform: scale(1.3);
+}
+
+.cursor-follower.hover-button {
+    transform: scale(1.1);
+}
+
+.cursor.hover-text {
+    transform: scale(0.7);
+}
+
+.cursor-follower.hover-text {
+    transform: scale(1.5);
+    border-width: 2px;
+}
+
+/* Bottom Navigation */
 .nav {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 15px 30px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 500px;
+    padding: 12px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--nav-bg);
-    backdrop-filter: blur(10px);
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     z-index: 1000;
-    border-bottom: 1px solid var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px var(--shadow);
     transition: all 0.3s ease;
 }
 
@@ -97,6 +158,7 @@ body {
     font-size: 22px;
     font-weight: 300;
     letter-spacing: 2px;
+    transition: color 0.3s ease;
 }
 
 .nav-links {
@@ -112,35 +174,47 @@ body {
     font-weight: 300;
     letter-spacing: 1px;
     position: relative;
-    transition: opacity 0.3s ease;
+    transition:
+        opacity 0.3s ease,
+        color 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: transparent;
+    border: 1px solid transparent;
 }
 
 .nav-link:hover {
     opacity: 0.7;
+    background: var(--card-bg);
+    border-color: var(--border-color);
 }
 
 .nav-link::after {
     content: "";
     position: absolute;
-    bottom: -5px;
-    left: 0;
+    bottom: 2px;
+    left: 50%;
     width: 0;
-    height: 1px;
+    height: 2px;
     background-color: var(--text-color);
-    transition: width 0.3s ease;
+    transition:
+        width 0.3s ease,
+        left 0.3s ease;
+    border-radius: 1px;
 }
 
 .nav-link:hover::after {
-    width: 100%;
+    width: 80%;
+    left: 10%;
 }
 
 /* Theme Toggle Button */
 .theme-toggle {
-    background: none;
+    background: var(--card-bg);
     border: 1px solid var(--border-color);
     color: var(--text-color);
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -148,11 +222,13 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 18px;
+    box-shadow: 0 2px 10px var(--shadow);
 }
 
 .theme-toggle:hover {
     border-color: var(--hover-border);
     transform: scale(1.1);
+    box-shadow: 0 4px 15px var(--hover-shadow);
 }
 
 .theme-icon {
@@ -165,8 +241,12 @@ body {
 
 /* Main Content */
 .main {
-    padding-top: 70px;
-    min-height: 100vh;
+    padding: 40px 0;
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+    position: relative;
+    z-index: 1;
 }
 
 /* Hero Section */
@@ -178,6 +258,7 @@ body {
     align-items: center;
     text-align: center;
     border-bottom: 1px solid var(--border-color);
+    margin-bottom: 40px;
 }
 
 .hero-title {
@@ -185,8 +266,9 @@ body {
     font-weight: 100;
     letter-spacing: 4px;
     margin-bottom: 15px;
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: color 0.3s ease;
 }
 
 .hero-subtitle {
@@ -194,15 +276,18 @@ body {
     font-weight: 300;
     opacity: 0.7;
     letter-spacing: 2px;
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: color 0.3s ease;
 }
 
 /* Portfolio Sections */
 .portfolio-section {
-    padding: 60px 30px;
-    max-width: 1400px;
+    padding: 40px 30px;
+    max-width: 1600px;
     margin: 0 auto;
+    width: 100%;
+    overflow: visible;
 }
 
 .section-title {
@@ -211,31 +296,56 @@ body {
     letter-spacing: 3px;
     margin-bottom: 40px;
     text-align: center;
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: color 0.3s ease;
+    color: var(--text-color) !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
-/* Portfolio Grid */
+/* Portfolio Grid - 4 columns minimum */
 .portfolio-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
     padding: 15px 0;
+    width: 100%;
+    overflow: visible;
+}
+
+/* Ensure at least 4 columns on larger screens */
+@media (min-width: 1200px) {
+    .portfolio-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 1600px) {
+    .portfolio-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
 }
 
 .portfolio-item {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    overflow: hidden;
-    transition: all 0.3s easeInOutSine;
-    opacity: 0;
-    transform: translateY(30px);
+    border-radius: 16px;
+    overflow: visible;
+    transition: all 0.3s ease;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
     cursor: pointer;
+    box-shadow: 0 4px 15px var(--shadow);
+    display: block !important;
+    visibility: visible !important;
+    position: relative;
 }
 
 .portfolio-item:hover {
     border-color: var(--hover-border);
-    transform: translateY(-3px);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px var(--hover-shadow);
 }
 
 .portfolio-image {
@@ -246,13 +356,15 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
+    border-radius: 16px 16px 0 0;
 }
 
 .portfolio-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s easeInOutSine;
+    transition: transform 0.3s ease;
 }
 
 .portfolio-item:hover .portfolio-image img {
@@ -268,6 +380,7 @@ body {
     font-weight: 300;
     letter-spacing: 1px;
     margin-bottom: 10px;
+    transition: color 0.3s ease;
 }
 
 .portfolio-description {
@@ -275,6 +388,7 @@ body {
     opacity: 0.7;
     line-height: 1.4;
     margin-bottom: 15px;
+    transition: color 0.3s ease;
 }
 
 .portfolio-link {
@@ -283,10 +397,14 @@ body {
     font-size: 0.9rem;
     letter-spacing: 1px;
     border-bottom: 1px solid transparent;
-    transition: border-color 0.3s easeInOutSine;
+    transition: all 0.3s ease;
+    padding: 4px 8px;
+    border-radius: 8px;
+    background: transparent;
 }
 
 .portfolio-link:hover {
+    background: var(--border-color);
     border-bottom-color: var(--text-color);
 }
 
@@ -295,8 +413,12 @@ body {
     text-align: center;
     padding: 40px 20px;
     font-size: 1.1rem;
-    opacity: var(--loading-opacity);
+    opacity: 1 !important;
     letter-spacing: 1px;
+    transition: color 0.3s ease;
+    color: var(--text-color) !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
 /* Modal */
@@ -310,6 +432,7 @@ body {
     background-color: var(--modal-bg);
     z-index: 10000;
     overflow-y: auto;
+    transition: background-color 0.3s ease;
 }
 
 .modal-content {
@@ -320,7 +443,9 @@ body {
     padding: 40px;
     background-color: var(--modal-content-bg);
     border: 1px solid var(--border-color);
-    transition: background-color 0.3s ease;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px var(--shadow);
+    transition: all 0.3s ease;
 }
 
 .modal-close {
@@ -330,16 +455,27 @@ body {
     font-size: 28px;
     color: var(--text-color);
     cursor: pointer;
-    transition: opacity 0.3s easeInOutSine;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
 }
 
 .modal-close:hover {
     opacity: 0.7;
+    background: var(--border-color);
+    transform: scale(1.1);
 }
 
 .modal-body {
     color: var(--text-color);
     line-height: 1.5;
+    transition: color 0.3s ease;
 }
 
 .modal-body h1,
@@ -348,17 +484,22 @@ body {
     margin-bottom: 15px;
     font-weight: 300;
     letter-spacing: 1px;
+    transition: color 0.3s ease;
 }
 
 .modal-body p {
     margin-bottom: 12px;
     opacity: 0.9;
+    transition: color 0.3s ease;
 }
 
 .modal-body img {
     width: 100%;
     margin: 15px 0;
     border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: border-color 0.3s ease;
+    object-fit: cover;
 }
 
 .work-detail h1 {
@@ -366,6 +507,7 @@ body {
     font-weight: 100;
     letter-spacing: 2px;
     margin-bottom: 25px;
+    transition: color 0.3s ease;
 }
 
 .work-main-image {
@@ -373,6 +515,9 @@ body {
     height: auto;
     margin: 25px 0;
     border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: border-color 0.3s ease;
+    object-fit: cover;
 }
 
 .work-content {
@@ -384,12 +529,14 @@ body {
     font-size: 1.6rem;
     margin: 25px 0 15px 0;
     font-weight: 200;
+    transition: color 0.3s ease;
 }
 
 .work-content h3 {
     font-size: 1.3rem;
     margin: 20px 0 12px 0;
     font-weight: 200;
+    transition: color 0.3s ease;
 }
 
 .work-content ul {
@@ -400,26 +547,47 @@ body {
 .work-content li {
     margin-bottom: 6px;
     opacity: 0.9;
+    transition: color 0.3s ease;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    body {
+        padding-bottom: 110px;
+    }
+
     .nav {
-        padding: 12px 20px;
-        flex-direction: column;
-        gap: 12px;
+        bottom: 15px;
+        width: calc(100% - 30px);
+        max-width: 400px;
+        padding: 10px 15px;
+        flex-direction: row;
+        justify-content: space-between;
+        background: var(--nav-bg);
     }
 
     .nav-links {
-        gap: 20px;
+        gap: 15px;
+    }
+
+    .nav-link {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+
+    .theme-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
     }
 
     .main {
-        padding-top: 110px;
+        padding-top: 20px;
     }
 
     .hero {
         height: 40vh;
+        margin-bottom: 30px;
     }
 
     .hero-title {
@@ -433,7 +601,7 @@ body {
     }
 
     .portfolio-section {
-        padding: 40px 20px;
+        padding: 30px 20px;
     }
 
     .section-title {
@@ -442,8 +610,8 @@ body {
     }
 
     .portfolio-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
     }
 
     .portfolio-content {
@@ -492,6 +660,39 @@ body {
     }
 }
 
+@media (max-width: 480px) {
+    .portfolio-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav {
+        bottom: 10px;
+        width: calc(100% - 20px);
+        max-width: 350px;
+        padding: 8px 12px;
+        background: var(--nav-bg);
+    }
+
+    .nav-links {
+        gap: 8px;
+    }
+
+    .nav-link {
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .nav-brand h1 {
+        font-size: 18px;
+    }
+
+    .theme-toggle {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+}
+
 /* Animation Classes */
 .fade-in {
     opacity: 1 !important;
@@ -515,23 +716,6 @@ body {
     transition: all 0.8s ease;
 }
 
-/* Theme transition improvements */
-* {
-    transition:
-        background-color 0.3s ease,
-        color 0.3s ease,
-        border-color 0.3s ease;
-}
-
-/* Compact spacing adjustments */
-.portfolio-content p {
-    margin-bottom: 8px;
-}
-
-.modal-body p {
-    margin-bottom: 10px;
-}
-
 /* Enhanced modal size for better work display */
 @media (min-width: 1200px) {
     .modal-content {
@@ -547,5 +731,31 @@ body {
     .work-content {
         font-size: 1.1rem;
         line-height: 1.7;
+    }
+}
+
+/* Compact spacing adjustments */
+.portfolio-content p {
+    margin-bottom: 8px;
+}
+
+.modal-body p {
+    margin-bottom: 10px;
+}
+
+/* Additional theme transition smoothness */
+* {
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+/* Ensure grid responsiveness for exactly 4 columns when possible */
+@media (min-width: 1200px) and (max-width: 1599px) {
+    .portfolio-grid {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1200px;
+        margin: 0 auto;
     }
 }
