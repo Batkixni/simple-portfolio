@@ -190,7 +190,7 @@ app.use((err, req, res, next) => {
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).send("頁面不存在");
+  res.status(404).sendFile(path.join(__dirname, "404.html"));
 });
 
 // 伺服器啟動時重新生成所有頁面

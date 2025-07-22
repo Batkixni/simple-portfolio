@@ -1,0 +1,810 @@
+<!doctype html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>404 - 頁面未找到 | Bax</title>
+        <link rel="icon" type="image/jpeg" href="src/images/favico.jpg" />
+        <link rel="stylesheet" href="src/css/style.css" />
+        <link rel="stylesheet" href="src/css/404.css" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    </head>
+    <body class="loading" style="overflow: hidden; height: 100vh">
+        <!-- 404 背景畫布 -->
+        <div id="error-canvas-container"></div>
+
+        <!-- Custom Cursor -->
+        <div class="cursor"></div>
+        <div class="cursor-follower"></div>
+
+        <!-- 數位時鐘 -->
+        <div class="digital-clock" id="digital-clock">
+            <span id="clock-time">00:00:00</span>
+        </div>
+
+        <!-- 404 錯誤內容 -->
+        <div class="error-container">
+            <div class="floating-particles" id="floating-particles"></div>
+
+            <div class="error-number glitch-text" data-text="404">404</div>
+
+            <h1 class="error-title">PAGE NOT FOUND</h1>
+
+            <p class="error-message">Are you lost in the internet?<br /></p>
+
+            <!-- 固定回到首頁按鈕 -->
+            <div class="home-button-fixed">
+                <a href="/" class="btn-home-fixed"> <span>←</span> HOME </a>
+            </div>
+        </div>
+
+        <!-- 狀態欄 -->
+        <div class="status-bar">
+            <div>
+                ERROR_404 | CONNECTION_LOST |
+                <span id="visitor-count">VISITOR_001</span>
+            </div>
+        </div>
+
+        <!-- Matrix雨效果 -->
+        <div class="matrix-rain" id="matrix-rain"></div>
+
+        <script>
+            // P5.js 404 背景動畫
+            let particles = [];
+            let grid = [];
+            let flowField = [];
+            let cols, rows;
+            let noiseScale = 0.01;
+            let time = 0;
+            let digitalLines = [];
+
+            function setup() {
+                let canvas = createCanvas(windowWidth, windowHeight);
+                canvas.parent("error-canvas-container");
+
+                // 計算網格
+                cols = Math.floor(width / 30);
+                rows = Math.floor(height / 30);
+
+                // 初始化粒子系統
+                for (let i = 0; i < 80; i++) {
+                    particles.push(new ErrorParticle());
+                }
+
+                // 初始化數位線條
+                for (let i = 0; i < 10; i++) {
+                    digitalLines.push(new DigitalLine());
+                }
+
+                // 初始化流場
+                flowField = new Array(cols * rows);
+            }
+
+            function draw() {
+                background(getBackgroundColor());
+
+                // 更新流場
+                updateFlowField();
+
+                // 繪製動態網格
+                drawGrid();
+
+                // 繪製數位線條
+                for (let line of digitalLines) {
+                    line.update();
+                    line.display();
+                }
+
+                // 更新和繪製粒子
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    particles[i].update();
+                    particles[i].display();
+
+                    if (particles[i].isDead()) {
+                        particles.splice(i, 1);
+                        particles.push(new ErrorParticle());
+                    }
+                }
+
+                // 繪製數字干擾效果
+                drawDigitalGlitch();
+
+                // 繪製連接線
+                drawConnections();
+
+                time += 0.008;
+            }
+
+            function updateFlowField() {
+                let yoff = 0;
+                for (let y = 0; y < rows; y++) {
+                    let xoff = 0;
+                    for (let x = 0; x < cols; x++) {
+                        let index = x + y * cols;
+                        let angle = noise(xoff, yoff, time) * TWO_PI * 2;
+                        let v = p5.Vector.fromAngle(angle);
+                        v.setMag(0.5);
+                        flowField[index] = v;
+                        xoff += noiseScale;
+                    }
+                    yoff += noiseScale;
+                }
+            }
+
+            function drawGrid() {
+                stroke(getTextColor());
+                strokeWeight(0.3);
+
+                for (let i = 0; i < cols - 1; i++) {
+                    for (let j = 0; j < rows - 1; j++) {
+                        let x = i * 30;
+                        let y = j * 30;
+
+                        let noiseVal = noise(
+                            i * noiseScale * 2,
+                            j * noiseScale * 2,
+                            time,
+                        );
+
+                        if (noiseVal > 0.7) {
+                            let alpha = map(noiseVal, 0.7, 1, 0, 100);
+                            let col = getTextColor();
+                            col.setAlpha(alpha);
+                            stroke(col);
+
+                            line(x, y, x + 30, y);
+                            line(x, y, x, y + 30);
+                        }
+
+                        if (noiseVal > 0.85) {
+                            fill(getTextColor());
+                            noStroke();
+                            circle(x, y, 3);
+                        }
+                    }
+                }
+            }
+
+            function drawConnections() {
+                stroke(getTextColor());
+                strokeWeight(0.5);
+
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        let d = dist(
+                            particles[i].x,
+                            particles[i].y,
+                            particles[j].x,
+                            particles[j].y,
+                        );
+                        if (d < 120) {
+                            let alpha = map(d, 0, 120, 50, 0);
+                            let col = getTextColor();
+                            col.setAlpha(alpha);
+                            stroke(col);
+                            line(
+                                particles[i].x,
+                                particles[i].y,
+                                particles[j].x,
+                                particles[j].y,
+                            );
+                        }
+                    }
+                }
+            }
+
+            function drawDigitalGlitch() {
+                if (random() < 0.015) {
+                    stroke(getTextColor());
+                    strokeWeight(random(1, 3));
+
+                    for (let i = 0; i < random(3, 8); i++) {
+                        let x = random(width);
+                        let y = random(height);
+                        let w = random(30, 150);
+                        let h = random(1, 3);
+
+                        let col = getTextColor();
+                        col.setAlpha(random(50, 150));
+                        stroke(col);
+
+                        rect(x, y, w, h);
+                    }
+                }
+            }
+
+            class ErrorParticle {
+                constructor() {
+                    this.reset();
+                    this.life = random(300, 500);
+                    this.maxLife = this.life;
+                    this.trail = [];
+                    this.maxTrail = 8;
+                }
+
+                reset() {
+                    this.x = random(width);
+                    this.y = random(height);
+                    this.vel = createVector(0, 0);
+                    this.acc = createVector(0, 0);
+                    this.size = random(2, 5);
+                    this.life = random(300, 500);
+                    this.maxLife = this.life;
+                    this.trail = [];
+                }
+
+                update() {
+                    // 跟隨流場
+                    let x = Math.floor(this.x / 30);
+                    let y = Math.floor(this.y / 30);
+                    let index = x + y * cols;
+
+                    if (flowField[index]) {
+                        let force = flowField[index].copy();
+                        force.mult(0.3);
+                        this.acc.add(force);
+                    }
+
+                    // 添加隨機擾動
+                    if (random() < 0.1) {
+                        let randomForce = p5.Vector.random2D();
+                        randomForce.mult(0.2);
+                        this.acc.add(randomForce);
+                    }
+
+                    this.vel.add(this.acc);
+                    this.vel.limit(2);
+                    this.x += this.vel.x;
+                    this.y += this.vel.y;
+                    this.acc.mult(0);
+
+                    // 更新軌跡
+                    this.trail.push({ x: this.x, y: this.y });
+                    if (this.trail.length > this.maxTrail) {
+                        this.trail.shift();
+                    }
+
+                    this.life--;
+
+                    // 邊界檢查 - 包裹
+                    if (this.x < 0) this.x = width;
+                    if (this.x > width) this.x = 0;
+                    if (this.y < 0) this.y = height;
+                    if (this.y > height) this.y = 0;
+                }
+
+                display() {
+                    let alpha = map(this.life, 0, this.maxLife, 0, 255);
+
+                    // 繪製軌跡
+                    for (let i = 0; i < this.trail.length - 1; i++) {
+                        let trailAlpha = map(
+                            i,
+                            0,
+                            this.trail.length - 1,
+                            0,
+                            alpha * 0.3,
+                        );
+                        let col = getTextColor();
+                        col.setAlpha(trailAlpha);
+                        stroke(col);
+                        strokeWeight(map(i, 0, this.trail.length - 1, 0.5, 2));
+
+                        if (this.trail[i + 1]) {
+                            line(
+                                this.trail[i].x,
+                                this.trail[i].y,
+                                this.trail[i + 1].x,
+                                this.trail[i + 1].y,
+                            );
+                        }
+                    }
+
+                    // 繪製主體
+                    let col = getTextColor();
+                    col.setAlpha(alpha * 0.6);
+                    fill(col);
+                    noStroke();
+                    circle(this.x, this.y, this.size);
+
+                    // 光暈效果
+                    if (random() < 0.1) {
+                        col.setAlpha(alpha * 0.2);
+                        fill(col);
+                        circle(this.x, this.y, this.size * 3);
+                    }
+                }
+
+                isDead() {
+                    return this.life <= 0;
+                }
+            }
+
+            class DigitalLine {
+                constructor() {
+                    this.reset();
+                }
+
+                reset() {
+                    this.x = random(width);
+                    this.y = random(height);
+                    this.length = random(50, 200);
+                    this.angle = random(TWO_PI);
+                    this.speed = random(0.5, 2);
+                    this.life = random(100, 200);
+                    this.maxLife = this.life;
+                }
+
+                update() {
+                    this.x += cos(this.angle) * this.speed;
+                    this.y += sin(this.angle) * this.speed;
+                    this.life--;
+
+                    if (
+                        this.life <= 0 ||
+                        this.x < -this.length ||
+                        this.x > width + this.length ||
+                        this.y < -this.length ||
+                        this.y > height + this.length
+                    ) {
+                        this.reset();
+                    }
+                }
+
+                display() {
+                    let alpha = map(this.life, 0, this.maxLife, 0, 100);
+                    let col = getTextColor();
+                    col.setAlpha(alpha);
+                    stroke(col);
+                    strokeWeight(1);
+
+                    let endX = this.x + cos(this.angle) * this.length;
+                    let endY = this.y + sin(this.angle) * this.length;
+
+                    line(this.x, this.y, endX, endY);
+                }
+            }
+
+            function windowResized() {
+                resizeCanvas(windowWidth, windowHeight);
+                cols = Math.floor(width / 30);
+                rows = Math.floor(height / 30);
+                flowField = new Array(cols * rows);
+            }
+
+            // 主題感知顏色函數
+            function getBackgroundColor() {
+                const isLight =
+                    document.documentElement.getAttribute("data-theme") ===
+                    "light";
+                return isLight ? color(254, 253, 248) : color(26, 26, 26);
+            }
+
+            function getTextColor() {
+                const isLight =
+                    document.documentElement.getAttribute("data-theme") ===
+                    "light";
+                return isLight ? color(0, 0, 0) : color(255, 255, 255);
+            }
+
+            // 光標系統變量
+            let cursor = null;
+            let cursorFollower = null;
+            let mouseX = 0;
+            let mouseY = 0;
+            let followerX = 0;
+            let followerY = 0;
+
+            // 光標跟隨動畫
+            function animateFollower() {
+                const diffX = mouseX - followerX;
+                const diffY = mouseY - followerY;
+
+                followerX += diffX * 0.1;
+                followerY += diffY * 0.1;
+
+                if (cursorFollower) {
+                    cursorFollower.style.left = followerX - 20 + "px";
+                    cursorFollower.style.top = followerY - 20 + "px";
+                }
+
+                requestAnimationFrame(animateFollower);
+            }
+
+            // DOM 初始化
+            document.addEventListener("DOMContentLoaded", function () {
+                // 移除loading狀態
+                setTimeout(() => {
+                    document.body.classList.remove("loading");
+                    document.body.classList.add("loaded");
+                }, 500);
+
+                // 初始化自定義光標
+                initCustomCursor();
+
+                // 創建浮動粒子
+                createFloatingParticles();
+
+                // 創建Matrix雨效果
+                createMatrixRain();
+
+                // 初始化數位時鐘
+                updateDigitalClock();
+                setInterval(updateDigitalClock, 1000);
+
+                // 更新訪客計數
+                updateVisitorCount();
+
+                // GSAP 入場動畫
+                gsap.timeline({ delay: 0.5 })
+                    .from(".error-number", {
+                        duration: 1.2,
+                        y: 100,
+                        opacity: 0,
+                        ease: "power3.out",
+                    })
+                    .from(
+                        ".error-title",
+                        {
+                            duration: 0.8,
+                            y: 50,
+                            opacity: 0,
+                            ease: "power2.out",
+                        },
+                        "-=0.6",
+                    )
+                    .from(
+                        ".error-message",
+                        {
+                            duration: 0.8,
+                            y: 30,
+                            opacity: 0,
+                            ease: "power2.out",
+                        },
+                        "-=0.4",
+                    )
+                    .from(
+                        ".btn-404",
+                        {
+                            duration: 0.6,
+                            y: 30,
+                            opacity: 0,
+                            stagger: 0.2,
+                            ease: "power2.out",
+                        },
+                        "-=0.3",
+                    )
+                    .from(
+                        ".digital-clock, .status-bar",
+                        {
+                            duration: 0.6,
+                            opacity: 0,
+                            ease: "power2.out",
+                        },
+                        "-=0.4",
+                    );
+
+                // 移除404數字的持續動畫
+                // 只保留靜態狀態
+            });
+
+            function initCustomCursor() {
+                cursor = document.querySelector(".cursor");
+                cursorFollower = document.querySelector(".cursor-follower");
+
+                if (cursor && cursorFollower) {
+                    // 啟動跟隨動畫
+                    animateFollower();
+
+                    // 滑鼠移動事件
+                    document.addEventListener("mousemove", function (e) {
+                        if (window.innerWidth > 768) {
+                            mouseX = e.clientX;
+                            mouseY = e.clientY;
+
+                            // 主cursor即時跟隨
+                            cursor.style.left = e.clientX - 10 + "px";
+                            cursor.style.top = e.clientY - 10 + "px";
+
+                            // 根據懸停元素改變cursor樣式
+                            if (e.target.closest(".btn-404")) {
+                                cursor.className = "cursor hover-button";
+                                cursorFollower.className =
+                                    "cursor-follower hover-button";
+                                // 添加按鈕懸停粒子效果
+                                createCursorParticles(e.clientX, e.clientY);
+                            } else if (e.target.closest(".error-number")) {
+                                cursor.className = "cursor hover-item";
+                                cursorFollower.className =
+                                    "cursor-follower hover-item";
+                                // 移除發光效果
+                            } else if (
+                                e.target.closest(".digital-clock, .status-bar")
+                            ) {
+                                cursor.className = "cursor hover-text";
+                                cursorFollower.className =
+                                    "cursor-follower hover-text";
+                            } else if (
+                                e.target.closest(".floating-particles")
+                            ) {
+                                cursor.className = "cursor hover-item";
+                                cursorFollower.className =
+                                    "cursor-follower hover-item";
+                                // 粒子區域特殊效果
+                                createRippleEffect(e.clientX, e.clientY);
+                            } else {
+                                cursor.className = "cursor";
+                                cursorFollower.className = "cursor-follower";
+                            }
+                        }
+                    });
+
+                    // 滑鼠離開窗口時隱藏光標
+                    document.addEventListener("mouseleave", function () {
+                        cursor.style.opacity = "0";
+                        cursorFollower.style.opacity = "0";
+                    });
+
+                    // 滑鼠進入窗口時顯示光標
+                    document.addEventListener("mouseenter", function () {
+                        cursor.style.opacity = "1";
+                        cursorFollower.style.opacity = "1";
+                    });
+
+                    // 在小屏幕上隱藏自定義光標
+                    function handleResize() {
+                        if (window.innerWidth <= 768) {
+                            cursor.style.display = "none";
+                            cursorFollower.style.display = "none";
+                            document.body.style.cursor = "auto";
+                        } else {
+                            cursor.style.display = "block";
+                            cursorFollower.style.display = "block";
+                            document.body.style.cursor = "none";
+                        }
+                    }
+
+                    window.addEventListener("resize", handleResize);
+                    handleResize(); // 初始檢查
+                }
+            }
+
+            // 光標粒子效果
+            function createCursorParticles(x, y) {
+                for (let i = 0; i < 6; i++) {
+                    const particle = document.createElement("div");
+                    particle.style.position = "fixed";
+                    particle.style.left = x + "px";
+                    particle.style.top = y + "px";
+                    particle.style.width = "4px";
+                    particle.style.height = "4px";
+                    particle.style.background = "var(--text-color)";
+                    particle.style.borderRadius = "50%";
+                    particle.style.pointerEvents = "none";
+                    particle.style.zIndex = "10000";
+                    particle.style.opacity = "0.8";
+
+                    document.body.appendChild(particle);
+
+                    const angle = (i / 6) * Math.PI * 2;
+                    const distance = 30;
+                    const endX = x + Math.cos(angle) * distance;
+                    const endY = y + Math.sin(angle) * distance;
+
+                    gsap.to(particle, {
+                        duration: 0.6,
+                        x: endX - x,
+                        y: endY - y,
+                        opacity: 0,
+                        scale: 0.3,
+                        ease: "power2.out",
+                        onComplete: () => particle.remove(),
+                    });
+                }
+            }
+
+            // 移除發光效果函數
+
+            // 漣漪效果
+            function createRippleEffect(x, y) {
+                const ripple = document.createElement("div");
+                ripple.style.position = "fixed";
+                ripple.style.left = x + "px";
+                ripple.style.top = y + "px";
+                ripple.style.width = "20px";
+                ripple.style.height = "20px";
+                ripple.style.border = "2px solid var(--text-color)";
+                ripple.style.borderRadius = "50%";
+                ripple.style.background = "transparent";
+                ripple.style.pointerEvents = "none";
+                ripple.style.zIndex = "9997";
+                ripple.style.transform = "translate(-50%, -50%)";
+                ripple.style.opacity = "0.6";
+
+                document.body.appendChild(ripple);
+
+                gsap.to(ripple, {
+                    duration: 0.8,
+                    scale: 8,
+                    opacity: 0,
+                    ease: "power2.out",
+                    onComplete: () => ripple.remove(),
+                });
+            }
+
+            function createFloatingParticles() {
+                const container = document.getElementById("floating-particles");
+
+                for (let i = 0; i < 25; i++) {
+                    const particle = document.createElement("div");
+                    particle.className = "particle-404";
+                    particle.style.left = Math.random() * 100 + "%";
+                    particle.style.top = Math.random() * 100 + "%";
+                    particle.style.animationDelay = Math.random() * 6 + "s";
+                    particle.style.animationDuration =
+                        Math.random() * 4 + 4 + "s";
+                    container.appendChild(particle);
+                }
+            }
+
+            function createMatrixRain() {
+                const container = document.getElementById("matrix-rain");
+                const characters =
+                    "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン";
+
+                for (let i = 0; i < 15; i++) {
+                    const column = document.createElement("div");
+                    column.className = "matrix-column";
+                    column.style.left = Math.random() * 100 + "%";
+                    column.style.animationDuration =
+                        Math.random() * 3 + 2 + "s";
+                    column.style.animationDelay = Math.random() * 2 + "s";
+
+                    let text = "";
+                    for (let j = 0; j < 20; j++) {
+                        text +=
+                            characters.charAt(
+                                Math.floor(Math.random() * characters.length),
+                            ) + "<br>";
+                    }
+                    column.innerHTML = text;
+
+                    container.appendChild(column);
+                }
+            }
+
+            function updateDigitalClock() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString("zh-TW", {
+                    hour12: false,
+                });
+                document.getElementById("clock-time").textContent = timeString;
+            }
+
+            function updateVisitorCount() {
+                const count = Math.floor(Math.random() * 999) + 1;
+                document.getElementById("visitor-count").textContent =
+                    `VISITOR_${count.toString().padStart(3, "0")}`;
+            }
+
+            // 鍵盤事件
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape" || e.key === "Enter") {
+                    gsap.to(".error-container", {
+                        duration: 0.5,
+                        opacity: 0,
+                        y: -50,
+                        ease: "power2.in",
+                        onComplete: () => {
+                            window.location.href = "/";
+                        },
+                    });
+                }
+            });
+
+            // 輕微的滑鼠移動視差效果（減少動畫強度）
+            document.addEventListener("mousemove", function (e) {
+                const x = (e.clientX / window.innerWidth) * 2 - 1;
+                const y = (e.clientY / window.innerHeight) * 2 - 1;
+
+                gsap.to(".error-number", {
+                    duration: 0.8,
+                    x: x * 5,
+                    y: y * 5,
+                    ease: "power2.out",
+                });
+
+                gsap.to(".floating-particles", {
+                    duration: 1.2,
+                    x: x * 3,
+                    y: y * 3,
+                    ease: "power2.out",
+                });
+            });
+
+            // 增強點擊效果
+            document.addEventListener("click", function (e) {
+                // 創建多層點擊波紋效果
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        const ripple = document.createElement("div");
+                        ripple.style.position = "fixed";
+                        ripple.style.left = e.clientX + "px";
+                        ripple.style.top = e.clientY + "px";
+                        ripple.style.width = "10px";
+                        ripple.style.height = "10px";
+                        ripple.style.borderRadius = "50%";
+                        ripple.style.border = `${2 - i * 0.5}px solid var(--text-color)`;
+                        ripple.style.background =
+                            i === 0 ? "var(--text-color)" : "transparent";
+                        ripple.style.pointerEvents = "none";
+                        ripple.style.zIndex = "1000";
+                        ripple.style.transform = "translate(-50%, -50%)";
+                        ripple.style.opacity = 1 - i * 0.3;
+
+                        document.body.appendChild(ripple);
+
+                        gsap.to(ripple, {
+                            duration: 0.8 + i * 0.2,
+                            scale: 15 + i * 5,
+                            opacity: 0,
+                            ease: "power2.out",
+                            onComplete: () => ripple.remove(),
+                        });
+                    }, i * 100);
+                }
+
+                // 光標震動效果
+                if (cursor && cursorFollower) {
+                    gsap.to(cursor, {
+                        duration: 0.1,
+                        x: "+=5",
+                        y: "+=5",
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "power2.inOut",
+                    });
+                }
+
+                // 創建點擊粒子爆炸
+                createClickExplosion(e.clientX, e.clientY);
+            });
+
+            // 點擊爆炸效果
+            function createClickExplosion(x, y) {
+                for (let i = 0; i < 12; i++) {
+                    const particle = document.createElement("div");
+                    particle.style.position = "fixed";
+                    particle.style.left = x + "px";
+                    particle.style.top = y + "px";
+                    particle.style.width = "3px";
+                    particle.style.height = "3px";
+                    particle.style.background = "var(--text-color)";
+                    particle.style.borderRadius = "50%";
+                    particle.style.pointerEvents = "none";
+                    particle.style.zIndex = "10001";
+
+                    document.body.appendChild(particle);
+
+                    const angle = (i / 12) * Math.PI * 2;
+                    const distance = 50 + Math.random() * 30;
+                    const endX = x + Math.cos(angle) * distance;
+                    const endY = y + Math.sin(angle) * distance;
+
+                    gsap.to(particle, {
+                        duration: 0.8,
+                        x: endX - x,
+                        y: endY - y,
+                        opacity: 0,
+                        scale: 0,
+                        rotation: 360,
+                        ease: "power2.out",
+                        onComplete: () => particle.remove(),
+                    });
+                }
+            }
+        </script>
+    </body>
+</html>

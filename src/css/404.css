@@ -1,0 +1,571 @@
+/* 404 Page Specific Styles */
+
+/* Body styling to prevent scrolling */
+body {
+    overflow: hidden !important;
+    height: 100vh !important;
+    margin: 0;
+    padding: 0;
+    cursor: none;
+}
+
+/* Container and Layout */
+.error-container {
+    position: relative;
+    z-index: 100;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    background: transparent;
+    overflow: hidden;
+}
+
+/* Main 404 Number */
+.error-number {
+    font-size: clamp(6rem, 15vw, 12rem);
+    font-weight: 900;
+    line-height: 0.8;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* 移除閃光效果 */
+
+/* Error Title */
+.error-title {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    font-weight: 300;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+
+/* Error Message */
+.error-message {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    max-width: 600px;
+}
+
+/* Action Buttons Container */
+.error-actions {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 404 Page Buttons */
+.btn-404 {
+    padding: 1rem 2rem;
+    background: transparent;
+    color: var(--text-color);
+    border: 2px solid var(--text-color);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    min-width: 150px;
+    border-radius: 25px;
+    cursor: pointer;
+}
+
+.btn-404::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: var(--text-color);
+    transition: left 0.3s ease;
+    z-index: -1;
+}
+
+.btn-404:hover::before {
+    left: 0;
+}
+
+.btn-404:hover {
+    color: var(--bg-color);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+}
+
+.btn-404:active {
+    transform: translateY(0);
+}
+
+/* Glitch Text Effect */
+.glitch-text {
+    position: relative;
+    display: inline-block;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.glitch-text::before {
+    animation: glitch-1 2s infinite;
+    color: #ff0000;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+.glitch-text::after {
+    animation: glitch-2 2s infinite;
+    color: #00ffff;
+    z-index: -2;
+    opacity: 0.8;
+}
+
+@keyframes glitch-1 {
+    0%,
+    14%,
+    15%,
+    49%,
+    50%,
+    99%,
+    100% {
+        transform: translate(0);
+        clip-path: inset(0);
+    }
+    15%,
+    49% {
+        transform: translate(-2px, 2px);
+        clip-path: inset(0 0 85% 0);
+    }
+}
+
+@keyframes glitch-2 {
+    0%,
+    20%,
+    21%,
+    62%,
+    63%,
+    99%,
+    100% {
+        transform: translate(0);
+        clip-path: inset(0);
+    }
+    21%,
+    62% {
+        transform: translate(2px, -2px);
+        clip-path: inset(85% 0 0 0);
+    }
+}
+
+/* Background Canvas Container */
+#error-canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: var(--bg-color);
+    overflow: hidden;
+}
+
+/* Floating Particles Container */
+.floating-particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Individual Particle */
+.particle-404 {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--text-color);
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: float 6s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.3;
+    }
+    50% {
+        transform: translateY(-100px) rotate(180deg);
+        opacity: 0.8;
+    }
+}
+
+/* Matrix Rain Effect */
+.matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.matrix-column {
+    position: absolute;
+    top: -100px;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    color: var(--text-color);
+    opacity: 0.1;
+    animation: matrix-fall linear infinite;
+}
+
+@keyframes matrix-fall {
+    0% {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.1;
+    }
+    90% {
+        opacity: 0.1;
+    }
+    100% {
+        transform: translateY(calc(100vh + 100px));
+        opacity: 0;
+    }
+}
+
+/* Digital Clock Effect */
+.digital-clock {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    font-family: "Courier New", monospace;
+    font-size: 1rem;
+    color: var(--text-color);
+    opacity: 0.5;
+    border: 1px solid var(--text-color);
+    padding: 0.5rem 1rem;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Status Bar */
+.status-bar {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Courier New", monospace;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    text-align: center;
+}
+
+/* Fixed Home Button */
+.home-button-fixed {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    z-index: 1000;
+    border-radius: 16px;
+}
+
+.btn-home-fixed {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background: var(--bg-color);
+    color: var(--text-color);
+    border: 2px solid var(--text-color);
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    opacity: 0.9;
+}
+
+.btn-home-fixed:hover {
+    opacity: 1;
+    transform: translateX(-3px);
+    background: var(--text-color);
+    color: var(--bg-color);
+}
+
+.btn-home-fixed span {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-home-fixed:hover span {
+    transform: translateX(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .error-container {
+        padding: 1rem;
+    }
+
+    .error-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .btn-404 {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    .digital-clock {
+        top: 1rem;
+        right: 1rem;
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    .status-bar {
+        bottom: 1rem;
+        font-size: 0.8rem;
+    }
+
+    .home-button-fixed {
+        top: 1rem;
+        left: 1rem;
+    }
+
+    .btn-home-fixed {
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .error-number {
+        font-size: clamp(4rem, 20vw, 8rem);
+    }
+
+    .error-title {
+        font-size: clamp(1.2rem, 6vw, 2rem);
+    }
+
+    .error-message {
+        font-size: clamp(0.9rem, 4vw, 1rem);
+        margin-bottom: 2rem;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .glitch-text::before,
+    .glitch-text::after,
+    .particle-404,
+    .matrix-column {
+        animation: none;
+    }
+
+    .btn-404,
+    .btn-home-fixed {
+        transition: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .error-number {
+        text-shadow: none;
+    }
+
+    .btn-404 {
+        border-width: 3px;
+    }
+
+    .particle-404 {
+        opacity: 0.8;
+    }
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .btn-404:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .btn-home-fixed {
+    background: var(--bg-color);
+    backdrop-filter: blur(10px);
+}
+
+[data-theme="light"] .digital-clock {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Dark theme specific enhancements */
+
+/* Loading states */
+.loading .error-container {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.loaded .error-container {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.6s ease;
+}
+
+/* Hover effects for the entire container */
+.error-container:hover .particle-404 {
+    animation-duration: 4s;
+}
+
+.error-container:hover .error-number {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
+
+/* Custom Cursor Styles for 404 Page */
+
+.cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    background-color: var(--cursor-color);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transition:
+        background-color 0.3s ease,
+        transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        opacity 0.3s ease;
+    opacity: 1;
+}
+
+.cursor-follower {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--cursor-color);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition:
+        border-color 0.3s ease,
+        transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        opacity 0.3s ease;
+    background: transparent;
+    opacity: 1;
+}
+
+/* Cursor hover states for 404 page */
+.cursor.hover-item {
+    transform: scale(2.5);
+    background-color: var(--text-color);
+    mix-blend-mode: normal;
+}
+
+.cursor-follower.hover-item {
+    transform: scale(2);
+    border-color: var(--text-color);
+}
+
+.cursor.hover-button {
+    transform: scale(1.8);
+    background-color: var(--text-color);
+    mix-blend-mode: normal;
+}
+
+.cursor-follower.hover-button {
+    transform: scale(1.3);
+    border-width: 2px;
+    border-color: var(--text-color);
+}
+
+.cursor.hover-text {
+    transform: scale(0.7);
+    opacity: 0.7;
+}
+
+.cursor-follower.hover-text {
+    transform: scale(1.5);
+    border-width: 2px;
+    opacity: 0.8;
+}
+
+/* Mobile cursor adjustments */
+@media (max-width: 768px) {
+    body {
+        cursor: auto !important;
+        overflow: hidden !important;
+    }
+
+    .cursor,
+    .cursor-follower {
+        display: none !important;
+    }
+
+    .error-container {
+        padding: 1rem;
+        height: 100vh;
+    }
+}
+
+/* Light theme cursor adjustments */
+[data-theme="light"] .cursor {
+    background-color: var(--cursor-color);
+}
+
+[data-theme="light"] .cursor-follower {
+    border-color: var(--cursor-color);
+}
+
+/* High contrast mode cursor */
+@media (prefers-contrast: high) {
+    .cursor {
+        mix-blend-mode: normal;
+        background-color: var(--text-color);
+    }
+
+    .cursor-follower {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion cursor */
+@media (prefers-reduced-motion: reduce) {
+    .cursor,
+    .cursor-follower {
+        transition: none;
+    }
+}
