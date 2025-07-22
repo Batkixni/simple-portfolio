@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>品牌動態標誌設計 - Bax Portfolio</title>
+        <meta name="description" content="為新創公司設計的動態標誌，展現現代感與活力" />
+        <link rel="stylesheet" href="/src/css/style.css" />
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    </head>
+    <body>
+        <!-- Loading Screen -->
+        <div id="loading-screen">
+            <div class="loading-content">
+                <div class="loading-logo">
+                    <h1>Bax</h1>
+                </div>
+                <div class="loading-progress">
+                    <div class="progress-bar"></div>
+                </div>
+                <p class="loading-text">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Background Canvas -->
+        <div id="canvas-container"></div>
+
+        <!-- Custom Cursor -->
+        <div class="cursor"></div>
+        <div class="cursor-follower"></div>
+
+        <!-- Navigation -->
+        <nav class="nav animate-element">
+            <div class="nav-brand">
+                <a href="/" class="brand-link">
+                    <h1>Bax</h1>
+                </a>
+            </div>
+            <button
+                class="theme-toggle"
+                id="theme-toggle"
+                aria-label="切換主題"
+            >
+                <span class="theme-icon">🌙</span>
+            </button>
+        </nav>
+
+        <!-- Work Detail Content -->
+        <main class="work-detail-page">
+            <!-- Fullscreen Hero Image -->
+            
+            <div class="work-hero-fullscreen">
+                <img src="/src/images/placeholder.svg" alt="品牌動態標誌設計" class="work-hero-bg" />
+                <div class="work-hero-overlay">
+                    <div class="work-hero-nav">
+                        <div class="work-category-hero">動態設計</div>
+                    </div>
+                    <div class="scroll-indicator">
+                        <span>向下滑動查看詳情</span>
+                        <div class="scroll-arrow">↓</div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Work Info Section -->
+            <section class="work-info-section">
+                <div class="work-info-container">
+                    <h1 class="work-title">品牌動態標誌設計</h1>
+                    <div class="work-meta-row">
+                        <div class="work-info-left">
+                            <p class="work-description">為新創公司設計的動態標誌，展現現代感與活力</p>
+                        </div>
+                        <div class="work-info-right">
+                            
+                            <div class="work-date">2023/12/1</div>
+                             <div class="work-tags"><span class="work-tag">動態設計</span><span class="work-tag">品牌設計</span><span class="work-tag">標誌動畫</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Work Content -->
+            <section class="work-content-section">
+                <div class="work-content-container">
+                    <article class="work-content animate-element">
+                        <div class="work-article"><h1>品牌動態標誌設計</h1>
+<p>這是一個為新創科技公司設計的動態標誌項目。客戶希望能夠在數位平台上展現品牌的現代感與創新精神。</p>
+<h2>設計概念</h2>
+<p>標誌的核心概念是「連結與成長」，透過簡潔的幾何形狀組合，表達公司在科技領域的專業性以及對未來的願景。</p>
+<h3>設計要素</h3>
+<ul>
+<li><strong>色彩</strong>: 使用單色設計，強調簡潔性</li>
+<li><strong>動畫</strong>: 流暢的變形動畫，展現品牌活力</li>
+<li><strong>時長</strong>: 3秒循環動畫</li>
+<li><strong>格式</strong>: SVG動畫，適用於網頁與數位媒體</li>
+</ul>
+<h2>技術實現</h2>
+<p>使用 After Effects 進行動畫設計，並轉換為 SVG 格式以確保在各種螢幕尺寸下的最佳顯示效果。</p>
+<h3>動畫階段</h3>
+<ol>
+<li><strong>起始狀態</strong>: 靜態標誌展示</li>
+<li><strong>變形階段</strong>: 元素重新組合</li>
+<li><strong>完成狀態</strong>: 回到初始狀態，形成循環</li>
+</ol>
+<h2>應用場景</h2>
+<ul>
+<li>網站載入動畫</li>
+<li>社群媒體頭像</li>
+<li>數位廣告開場</li>
+<li>簡報動畫</li>
+</ul>
+<p>這個項目展現了動態設計在品牌識別中的重要性，透過動畫為靜態標誌注入生命力。</p>
+</div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer animate-element">
+            <div class="footer-content">
+                <p>&copy; 2024 Bax. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Twitter</a>
+                    <a href="#" class="footer-link">GitHub</a>
+                    <a href="#" class="footer-link">Instagram</a>
+                    <a href="#" class="footer-link">Pixiv</a>
+                </div>
+            </div>
+        </footer>
+
+        <script src="/src/js/animations.js"></script>
+        <script src="/src/js/app.js"></script>
+        <script src="/src/js/particles.js"></script>
+    </body>
+</html>

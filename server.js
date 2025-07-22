@@ -3,9 +3,17 @@ const path = require("path");
 const fs = require("fs-extra");
 const marked = require("marked");
 const fm = require("front-matter");
+const PageGenerator = require("./utils/page-generator");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// 初始化頁面生成器
+const pageGenerator = new PageGenerator(
+  __dirname,
+  path.join(__dirname, "templates"),
+  __dirname,
+);
 
 // Configure marked options
 marked.setOptions({
@@ -17,9 +25,24 @@ marked.setOptions({
 app.use("/src", express.static(path.join(__dirname, "src")));
 app.use("/images", express.static(path.join(__dirname, "src/images")));
 
+// Serve generated work pages
+app.use("/work", express.static(path.join(__dirname, "work")));
+
 // Serve main page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
+});
+
+// Serve individual work pages
+app.get("/work/:category/:id", (req, res) => {
+  const { category, id } = req.params;
+  const workPagePath = path.join(__dirname, "work", category, `${id}.html`);
+
+  if (fs.existsSync(workPagePath)) {
+    res.sendFile(workPagePath);
+  } else {
+    res.status(404).send("作品頁面不存在");
+  }
 });
 
 // API endpoint to get works by category
@@ -70,7 +93,7 @@ app.get("/api/works/:category", async (req, res) => {
     const html = works
       .map(
         (work) => `
-            <div class="portfolio-item" data-work="${work.path}">
+            <a href="/work/${work.path}" class="portfolio-item" data-work="${work.path}">
                 <div class="portfolio-image">
                     <img src="${work.image}" alt="${work.title}" loading="lazy">
                 </div>
@@ -78,7 +101,7 @@ app.get("/api/works/:category", async (req, res) => {
                     <h3 class="portfolio-title">${work.title}</h3>
                     <span class="portfolio-year">${work.date ? new Date(work.date).getFullYear() : ""}</span>
                 </div>
-            </div>
+            </a>
         `,
       )
       .join("");
@@ -170,9 +193,23 @@ app.use((req, res) => {
   res.status(404).send("頁面不存在");
 });
 
-app.listen(PORT, () => {
-  console.log(`伺服器運行在 http://localhost:${PORT}`);
-  console.log("按 Ctrl+C 停止伺服器");
-});
+// 伺服器啟動時重新生成所有頁面
+async function startServer() {
+  try {
+    console.log("正在重新生成所有作品頁面...");
+    await pageGenerator.generateAllPages();
+    console.log("頁面生成完成！");
+
+    app.listen(PORT, () => {
+      console.log(`伺服器運行在 http://localhost:${PORT}`);
+      console.log("按 Ctrl+C 停止伺服器");
+    });
+  } catch (error) {
+    console.error("伺服器啟動失敗:", error);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 module.exports = app;

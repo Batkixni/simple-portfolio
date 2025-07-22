@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-TW">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>書籍封面設計 - Bax Portfolio</title>
+        <meta name="description" content="為文學小說設計的封面，融合手繪插畫與現代排版技巧" />
+        <link rel="stylesheet" href="/src/css/style.css" />
+        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    </head>
+    <body>
+        <!-- Loading Screen -->
+        <div id="loading-screen">
+            <div class="loading-content">
+                <div class="loading-logo">
+                    <h1>Bax</h1>
+                </div>
+                <div class="loading-progress">
+                    <div class="progress-bar"></div>
+                </div>
+                <p class="loading-text">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Background Canvas -->
+        <div id="canvas-container"></div>
+
+        <!-- Custom Cursor -->
+        <div class="cursor"></div>
+        <div class="cursor-follower"></div>
+
+        <!-- Navigation -->
+        <nav class="nav animate-element">
+            <div class="nav-brand">
+                <a href="/" class="brand-link">
+                    <h1>Bax</h1>
+                </a>
+            </div>
+            <button
+                class="theme-toggle"
+                id="theme-toggle"
+                aria-label="切換主題"
+            >
+                <span class="theme-icon">🌙</span>
+            </button>
+        </nav>
+
+        <!-- Work Detail Content -->
+        <main class="work-detail-page">
+            <!-- Fullscreen Hero Image -->
+            
+            <div class="work-hero-fullscreen">
+                <img src="/src/images/placeholder.svg" alt="書籍封面設計" class="work-hero-bg" />
+                <div class="work-hero-overlay">
+                    <div class="work-hero-nav">
+                        <div class="work-category-hero">平面設計</div>
+                    </div>
+                    <div class="scroll-indicator">
+                        <span>向下滑動查看詳情</span>
+                        <div class="scroll-arrow">↓</div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Work Info Section -->
+            <section class="work-info-section">
+                <div class="work-info-container">
+                    <h1 class="work-title">書籍封面設計</h1>
+                    <div class="work-meta-row">
+                        <div class="work-info-left">
+                            <p class="work-description">為文學小說設計的封面，融合手繪插畫與現代排版技巧</p>
+                        </div>
+                        <div class="work-info-right">
+                            
+                            <div class="work-date">2023/9/10</div>
+                             <div class="work-tags"><span class="work-tag">書籍設計</span><span class="work-tag">封面設計</span><span class="work-tag">插畫</span><span class="work-tag">排版</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Work Content -->
+            <section class="work-content-section">
+                <div class="work-content-container">
+                    <article class="work-content animate-element">
+                        <div class="work-article"><h1>書籍封面設計</h1>
+<p>這是為一本現代文學小說《城市邊緣》設計的封面作品。小說描述都市人在快節奏生活中的孤獨與掙扎，封面設計試圖透過視覺語言捕捉這種微妙的情感狀態。</p>
+<h2>設計概念</h2>
+<p>小說的核心主題是現代人的疏離感，我們選擇用抽象的視覺手法來表達這種內在的情感張力。設計靈感來自於城市天際線的輪廓，以及個人在龐大都市中的渺小感。</p>
+<h3>創作理念</h3>
+<ul>
+<li><strong>孤獨</strong>: 透過負空間營造孤獨氛圍</li>
+<li><strong>都市感</strong>: 運用幾何線條模擬建築輪廓</li>
+<li><strong>情感層次</strong>: 色彩漸變表達內心世界</li>
+<li><strong>文學性</strong>: 保持封面的文學質感與深度</li>
+</ul>
+<h2>視覺元素分析</h2>
+<h3>色彩策略</h3>
+<p>主色調採用深藍到黑色的漸變，象徵夜晚的城市與內心的深沉。橘黃色的點綴代表城市中微弱的溫暖光源，也暗示希望的存在。</p>
+<ul>
+<li><strong>主色</strong>: 深藍 (#1a237e) 到黑色 (#000000)</li>
+<li><strong>強調色</strong>: 暖橘 (#ff6f00)</li>
+<li><strong>輔助色</strong>: 灰白 (#f5f5f5)</li>
+</ul>
+<h3>圖像處理</h3>
+<p>背景使用手繪的城市天際線輪廓，經過數位化處理後與幾何元素結合。人物剪影以簡化的方式呈現，強調個體在城市中的存在感。</p>
+<h3>字體設計</h3>
+<ul>
+<li><strong>書名</strong>: 自訂字體，筆畫間融入建築線條元素</li>
+<li><strong>作者名</strong>: 細體無襯線字體，保持清晰易讀</li>
+<li><strong>版面</strong>: 採用不對稱構圖，創造視覺動態</li>
+</ul>
+<h2>技術執行</h2>
+<h3>創作流程</h3>
+<ol>
+<li><strong>概念發展</strong>: 閱讀小說並提取關鍵視覺概念</li>
+<li><strong>草圖繪製</strong>: 手繪多種構圖可能性</li>
+<li><strong>數位化</strong>: 將手繪元素掃描並向量化</li>
+<li><strong>色彩實驗</strong>: 測試不同色彩組合的情感表達</li>
+<li><strong>排版調整</strong>: 精細調整文字與圖像的平衡關係</li>
+</ol>
+<h3>軟體工具</h3>
+<ul>
+<li><strong>Adobe Illustrator</strong>: 向量圖形製作</li>
+<li><strong>Adobe Photoshop</strong>: 質感處理與色彩調整</li>
+<li><strong>手繪</strong>: 鉛筆素描，建立基礎構圖</li>
+</ul>
+<h2>市場考量</h2>
+<h3>目標讀者</h3>
+<p>25-45歲的都市讀者，對文學作品有一定品味，重視視覺設計的質感。</p>
+<h3>書店陳列</h3>
+<p>考慮到書店環境的陳列效果，設計在縮小到實際尺寸時依然保持強烈的視覺衝擊力。封面的垂直構圖在書架上能夠脫穎而出。</p>
+<h3>系列化可能</h3>
+<p>為出版社設計了一套可延展的視覺系統，可應用於同系列其他書籍，建立品牌一致性。</p>
+<h2>印刷製作</h2>
+<h3>材質選擇</h3>
+<ul>
+<li><strong>封面</strong>: 黑卡紙 + 局部UV上光</li>
+<li><strong>內頁</strong>: 米色道林紙，保護閱讀舒適度</li>
+<li><strong>裝訂</strong>: 膠裝，符合文學書籍的傳統質感</li>
+</ul>
+<h3>特殊工藝</h3>
+<p>書名部分採用燙金工藝，在燈光下會產生微妙的反光效果，增加封面的層次感與質感。</p>
+<h2>設計成果</h2>
+<p>這個封面設計成功捕捉了小說的文學氣質與都市主題，在書店陳列中獲得了良好的視覺效果。讀者反饋認為封面準確傳達了小說的情感基調，有效吸引了目標讀者群體。</p>
+<h3>銷售表現</h3>
+<ul>
+<li>首月銷量比預期高出 20%</li>
+<li>獲得多個書店推薦展示</li>
+<li>在社群媒體上獲得大量分享</li>
+<li>為出版社贏得年度設計獎項提名</li>
+</ul>
+<h3>設計延伸</h3>
+<p>基於這個成功案例，出版社委託設計了整個文學書系的視覺識別，建立了統一而富有識別度的品牌形象。</p>
+<p>這個項目展現了書籍封面設計在文學作品推廣中的重要作用，一個優秀的封面不僅是書籍的包裝，更是內容的視覺詮釋與情感表達。</p>
+</div>
+                    </article>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer animate-element">
+            <div class="footer-content">
+                <p>&copy; 2024 Bax. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Twitter</a>
+                    <a href="#" class="footer-link">GitHub</a>
+                    <a href="#" class="footer-link">Instagram</a>
+                    <a href="#" class="footer-link">Pixiv</a>
+                </div>
+            </div>
+        </footer>
+
+        <script src="/src/js/animations.js"></script>
+        <script src="/src/js/app.js"></script>
+        <script src="/src/js/particles.js"></script>
+    </body>
+</html>

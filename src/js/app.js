@@ -176,53 +176,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // 模態框功能
-  function openModal(workPath) {
-    const modal = document.getElementById("work-modal");
-    if (modal) {
-      modal.style.display = "block";
-      modal.style.opacity = "0";
-
-      setTimeout(() => {
-        modal.style.opacity = "1";
-      }, 10);
-
-      document.body.style.overflow = "hidden";
-    }
-  }
-
-  function closeModal() {
-    const modal = document.getElementById("work-modal");
-    if (modal) {
-      modal.style.opacity = "0";
-      setTimeout(() => {
-        modal.style.display = "none";
-        document.body.style.overflow = "auto";
-      }, 300);
-    }
-  }
-
-  // 模態框事件監聽
+  // 處理導航連結，特別是帶有錨點的連結
   document.addEventListener("click", function (e) {
-    if (
-      e.target.classList.contains("modal-close") ||
-      e.target.classList.contains("modal")
-    ) {
-      closeModal();
-    }
-
-    // 作品項目點擊
-    if (e.target.closest(".portfolio-item")) {
-      const workPath = e.target.closest(".portfolio-item").dataset.work;
-      if (workPath) {
-        openModal(workPath);
+    // 處理回到首頁的錨點連結
+    if (e.target.matches('a[href^="/#"]')) {
+      const hash = e.target.getAttribute("href").substring(1);
+      if (window.location.pathname === "/") {
+        // 如果已經在首頁，進行平滑滾動
+        e.preventDefault();
+        const targetElement = document.querySelector(hash);
+        if (targetElement) {
+          isScrolling = true;
+          smoothScrollTo(targetElement);
+          setTimeout(() => {
+            isScrolling = false;
+          }, 500);
+        }
       }
-    }
-  });
-
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") {
-      closeModal();
+      // 如果不在首頁，讓瀏覽器正常導航到首頁+錨點
     }
   });
 });
