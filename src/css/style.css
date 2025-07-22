@@ -54,14 +54,20 @@ html {
     text-align: center;
 }
 
-.loading-logo h1 {
-    font-size: 3rem;
-    font-weight: 300;
-    letter-spacing: 3px;
+.loading-logo #loading-svg {
+    width: 120px;
+    height: auto;
     margin-bottom: 30px;
-    color: var(--text-color);
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(20px) scale(0.8);
+}
+
+.loading-logo #loading-svg path {
+    fill: transparent;
+    stroke: var(--text-color);
+    stroke-width: 2;
+    opacity: 1;
+    color: var(--text-color);
 }
 
 .loading-progress {

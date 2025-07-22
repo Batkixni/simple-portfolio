@@ -6,7 +6,8 @@ class LoadingAnimation {
   constructor() {
     this.loadingScreen = document.getElementById("loading-screen");
     this.progressBar = document.querySelector(".progress-bar");
-    this.loadingLogo = document.querySelector(".loading-logo h1");
+    this.loadingSvg = document.querySelector("#loading-svg");
+    this.loadingSvgPaths = document.querySelectorAll("#loading-svg path");
     this.loadingText = document.querySelector(".loading-text");
     this.progress = 0;
     this.isComplete = false;
@@ -30,14 +31,21 @@ class LoadingAnimation {
       return;
     }
 
-    // Animate loading logo in
-    gsap.to(this.loadingLogo, {
+    // Initialize SVG paths
+    this.initializeSvgPaths();
+
+    // Animate SVG logo in with scale
+    gsap.to(this.loadingSvg, {
       opacity: 1,
       y: 0,
-      duration: 0.8,
+      scale: 1,
+      duration: 1.2,
       ease: "power2.out",
       delay: 0.2,
     });
+
+    // Animate SVG paths with draw-on effect
+    this.animateSvgPaths();
 
     // Animate loading text in
     gsap.to(this.loadingText, {
@@ -45,11 +53,69 @@ class LoadingAnimation {
       y: 0,
       duration: 0.6,
       ease: "power2.out",
-      delay: 0.5,
+      delay: 1.0,
     });
 
     // Start progress animation
     this.startProgress();
+  }
+
+  initializeSvgPaths() {
+    // Set initial state for SVG paths
+    this.loadingSvgPaths.forEach((path) => {
+      const pathLength = path.getTotalLength();
+      gsap.set(path, {
+        strokeDasharray: pathLength,
+        strokeDashoffset: pathLength,
+        fill: "transparent",
+        stroke: "currentColor",
+        strokeWidth: 2,
+        opacity: 1,
+      });
+    });
+  }
+
+  animateSvgPaths() {
+    // Create timeline for path animations
+    const pathTimeline = gsap.timeline({ delay: 0.5 });
+
+    this.loadingSvgPaths.forEach((path, index) => {
+      // Draw path with stroke
+      pathTimeline.to(
+        path,
+        {
+          strokeDashoffset: 0,
+          duration: 1.5,
+          ease: "power2.inOut",
+        },
+        index * 0.4,
+      );
+
+      // Fill path after drawing
+      pathTimeline.to(
+        path,
+        {
+          fill: "currentColor",
+          strokeWidth: 0,
+          duration: 0.8,
+          ease: "power2.out",
+        },
+        index * 0.4 + 1.2,
+      );
+
+      // Add subtle glow pulsing effect
+      pathTimeline.to(
+        path,
+        {
+          filter: "drop-shadow(0 0 8px currentColor)",
+          duration: 0.6,
+          ease: "power2.inOut",
+          yoyo: true,
+          repeat: 1,
+        },
+        index * 0.4 + 1.8,
+      );
+    });
   }
 
   skipLoadingAnimation() {
@@ -63,10 +129,16 @@ class LoadingAnimation {
     // Simulate loading progress
     const progressTween = gsap.to(this, {
       progress: 100,
-      duration: 2.5,
+      duration: 3.5,
       ease: "power2.inOut",
       onUpdate: () => {
         this.progressBar.style.width = this.progress + "%";
+
+        // Add glow effect to SVG based on progress
+        if (this.loadingSvg) {
+          const glowIntensity = this.progress / 100;
+          this.loadingSvg.style.filter = `drop-shadow(0 0 ${glowIntensity * 20}px var(--text-color))`;
+        }
       },
       onComplete: () => {
         this.complete();
@@ -77,10 +149,19 @@ class LoadingAnimation {
   complete() {
     this.isComplete = true;
 
+    // Final flourish animation for SVG
+    gsap.to(this.loadingSvg, {
+      scale: 1.1,
+      duration: 0.5,
+      ease: "power2.out",
+      yoyo: true,
+      repeat: 1,
+    });
+
     // Small delay before hiding
     setTimeout(() => {
       this.hide();
-    }, 300);
+    }, 800);
   }
 
   hide() {
