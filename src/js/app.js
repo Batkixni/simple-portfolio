@@ -1,6 +1,12 @@
 // 簡化版本 - 使用CSS類控制cursor效果
 console.log("App.js loaded");
 
+// Browser compatibility checks
+const supportsModernScrolling =
+  "scrollBehavior" in document.documentElement.style;
+const supportsSmoothScroll =
+  CSS.supports && CSS.supports("scroll-behavior", "smooth");
+
 // 全局變量
 let cursor = null;
 let cursorFollower = null;
@@ -9,8 +15,11 @@ let mouseY = 0;
 let followerX = 0;
 let followerY = 0;
 
-// Smooth scroll variables
+// Enhanced smooth scroll variables
 let isScrolling = false;
+let scrollVelocity = 0;
+let scrollMomentum = 0;
+let momentumFrame = null;
 
 // 平滑跟隨動畫函數
 function animateFollower() {
@@ -133,28 +142,56 @@ window.addEventListener("load", function () {
   }
 });
 
-// Enhanced smooth scrolling function
-function smoothScrollTo(target, duration = 500) {
-  const targetPosition = target.offsetTop;
-  const startPosition = window.pageYOffset;
-  const distance = targetPosition - startPosition;
-  let startTime = null;
+// Modern smooth scrolling using native CSS scroll-behavior with fallback
+function smoothScrollTo(target, duration = 800) {
+  const targetPosition = target.offsetTop - 80; // Account for nav height
 
-  function animation(currentTime) {
-    if (startTime === null) startTime = currentTime;
-    const timeElapsed = currentTime - startTime;
-    const run = ease(timeElapsed, startPosition, distance, duration);
-    window.scrollTo(0, run);
-    if (timeElapsed < duration) requestAnimationFrame(animation);
+  if (supportsModernScrolling && supportsSmoothScroll) {
+    // Use native smooth scrolling for better performance
+    window.scrollTo({
+      top: targetPosition,
+      behavior: "smooth",
+    });
+  } else {
+    // Fallback for older browsers
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    let startTime = null;
+
+    function animation(currentTime) {
+      if (startTime === null) startTime = currentTime;
+      const timeElapsed = currentTime - startTime;
+      const run = easeInOutQuad(timeElapsed, startPosition, distance, duration);
+      window.scrollTo(0, run);
+      if (timeElapsed < duration) requestAnimationFrame(animation);
+    }
+
+    function easeInOutQuad(t, b, c, d) {
+      t /= d / 2;
+      if (t < 1) return (c / 2) * t * t + b;
+      t--;
+      return (-c / 2) * (t * (t - 2) - 1) + b;
+    }
+
+    requestAnimationFrame(animation);
+  }
+}
+
+// Enhanced momentum scrolling for wheel events
+function applyMomentumScrolling() {
+  if (Math.abs(scrollMomentum) < 0.1) {
+    scrollMomentum = 0;
+    if (momentumFrame) {
+      cancelAnimationFrame(momentumFrame);
+      momentumFrame = null;
+    }
+    return;
   }
 
-  // Better easing curve - cubic-bezier(0.25, 0.46, 0.45, 0.94)
-  function ease(t, b, c, d) {
-    t /= d;
-    return c * (t * t * t * (t * (t * 6 - 15) + 10)) + b;
-  }
+  window.scrollBy(0, scrollMomentum);
+  scrollMomentum *= 0.92; // Friction coefficient for smooth deceleration
 
-  requestAnimationFrame(animation);
+  momentumFrame = requestAnimationFrame(applyMomentumScrolling);
 }
 
 // 導航連結功能
@@ -179,28 +216,35 @@ document.addEventListener("DOMContentLoaded", function () {
   // 處理導航連結，特別是帶有錨點的連結
   document.addEventListener("click", function (e) {
     // 處理作品項目點擊
-    const portfolioItem = e.target.closest('.portfolio-item');
+    const portfolioItem = e.target.closest(".portfolio-item");
     if (portfolioItem) {
-      const workLink = portfolioItem.querySelector('a');
+      const workLink = portfolioItem.querySelector("a");
       if (workLink) {
         // 設置內部導航標記
-        sessionStorage.setItem('internalNavigation', 'true');
+        sessionStorage.setItem("internalNavigation", "true");
         // 如果有轉場管理器，讓它處理轉場
         if (window.transitionManager && window.transitionManager.isHomepage()) {
-          sessionStorage.setItem('fromHomepage', 'true');
+          sessionStorage.setItem("fromHomepage", "true");
         }
       }
       return; // 讓轉場管理器處理作品項目的導航
     }
 
     // 處理所有內部連結點擊
-    const link = e.target.closest('a');
+    const link = e.target.closest("a");
     if (link && link.href) {
-      const href = link.getAttribute('href');
+      const href = link.getAttribute("href");
       // 檢查是否為內部連結
-      if (href && (href.startsWith('/') || href.startsWith('./') || href.startsWith('../') ||
-          (!href.startsWith('http') && !href.startsWith('mailto:') && !href.startsWith('tel:')))) {
-        sessionStorage.setItem('internalNavigation', 'true');
+      if (
+        href &&
+        (href.startsWith("/") ||
+          href.startsWith("./") ||
+          href.startsWith("../") ||
+          (!href.startsWith("http") &&
+            !href.startsWith("mailto:") &&
+            !href.startsWith("tel:")))
+      ) {
+        sessionStorage.setItem("internalNavigation", "true");
       }
     }
 
@@ -240,59 +284,103 @@ document.addEventListener("htmx:responseError", function (e) {
 document.addEventListener("htmx:afterRequest", function (e) {
   if (e.target.classList.contains("portfolio-grid")) {
     // 為新載入的作品項目添加轉場標記
-    const portfolioItems = e.target.querySelectorAll('.portfolio-item');
-    portfolioItems.forEach(item => {
-      item.addEventListener('click', () => {
+    const portfolioItems = e.target.querySelectorAll(".portfolio-item");
+    portfolioItems.forEach((item) => {
+      item.addEventListener("click", () => {
         if (window.transitionManager && window.transitionManager.isHomepage()) {
-          sessionStorage.setItem('fromHomepage', 'true');
+          sessionStorage.setItem("fromHomepage", "true");
         }
       });
     });
   }
 });
 
-// Add smooth scrolling for mouse wheel with better responsiveness
-let scrollTimeout;
-let isWheelScrolling = false;
+// Enhanced smooth wheel scrolling with momentum
+let lastWheelTime = 0;
+let wheelTimeout = null;
 
 document.addEventListener(
   "wheel",
   function (e) {
     if (isScrolling) return;
 
-    e.preventDefault();
-
-    if (!isWheelScrolling) {
-      isWheelScrolling = true;
-      const delta = e.deltaY;
-      const scrollTop = window.pageYOffset;
-      const scrollAmount =
-        Math.abs(delta) > 100
-          ? delta > 0
-            ? 300
-            : -300
-          : delta > 0
-            ? 150
-            : -150;
-      const targetScroll = scrollTop + scrollAmount;
-
-      window.scrollTo({
-        top: Math.max(
-          0,
-          Math.min(
-            document.body.scrollHeight - window.innerHeight,
-            targetScroll,
-          ),
-        ),
-        behavior: "smooth",
-      });
-
-      setTimeout(() => {
-        isWheelScrolling = false;
-      }, 50);
+    // Check if user prefers reduced motion or browser doesn't support smooth scrolling
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !supportsModernScrolling
+    ) {
+      return; // Let browser handle native scrolling
     }
+
+    const now = performance.now();
+    const timeDelta = now - lastWheelTime;
+    lastWheelTime = now;
+
+    // Only apply custom scrolling for trackpad/smooth wheels
+    if (Math.abs(e.deltaY) < 50 && timeDelta < 100) {
+      e.preventDefault();
+
+      // Add to momentum
+      scrollVelocity = e.deltaY * 0.8;
+      scrollMomentum += scrollVelocity;
+
+      // Clamp momentum to prevent excessive speed
+      scrollMomentum = Math.max(-15, Math.min(15, scrollMomentum));
+
+      // Start momentum animation if not already running
+      if (!momentumFrame) {
+        momentumFrame = requestAnimationFrame(applyMomentumScrolling);
+      }
+
+      // Clear any existing timeout
+      if (wheelTimeout) {
+        clearTimeout(wheelTimeout);
+      }
+
+      // Stop momentum after inactivity
+      wheelTimeout = setTimeout(() => {
+        scrollMomentum *= 0.5;
+      }, 150);
+    }
+    // For mouse wheels or large deltas, use native scrolling
   },
   { passive: false },
 );
 
-console.log("App.js setup complete");
+// Performance optimization: throttle scroll events
+let isScrollEventThrottled = false;
+
+function throttledScrollHandler() {
+  if (!isScrollEventThrottled) {
+    isScrollEventThrottled = true;
+    requestAnimationFrame(() => {
+      // Handle any scroll-related logic here if needed
+      isScrollEventThrottled = false;
+    });
+  }
+}
+
+// Add passive scroll listener for better performance
+document.addEventListener("scroll", throttledScrollHandler, { passive: true });
+
+// Cleanup momentum scrolling on page visibility change
+document.addEventListener("visibilitychange", function () {
+  if (document.hidden) {
+    scrollMomentum = 0;
+    if (momentumFrame) {
+      cancelAnimationFrame(momentumFrame);
+      momentumFrame = null;
+    }
+  }
+});
+
+// Cleanup on page unload
+window.addEventListener("beforeunload", function () {
+  scrollMomentum = 0;
+  if (momentumFrame) {
+    cancelAnimationFrame(momentumFrame);
+    momentumFrame = null;
+  }
+});
+
+console.log("App.js setup complete with enhanced smooth scrolling");

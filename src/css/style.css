@@ -6,19 +6,21 @@
 }
 
 html {
-    scroll-behavior: auto;
-    scroll-padding-top: 20px;
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
 }
 
-/* Smooth scrolling enhancement */
-* {
-    scroll-behavior: auto;
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {
     html {
-        scroll-behavior: auto;
-        scroll-padding-top: 20px;
+        scroll-behavior: smooth;
+        scroll-padding-top: 80px;
     }
 
     body {
@@ -195,7 +197,6 @@ body {
     padding-bottom: 120px; /* Space for bottom nav */
     min-height: 100vh;
     position: relative;
-    scroll-behavior: auto;
 }
 
 /* Animation Elements - Initially Hidden */
@@ -236,15 +237,15 @@ body {
 /* Enhanced smooth scrolling */
 @media (prefers-reduced-motion: no-preference) {
     body {
-        scroll-behavior: auto;
+        scroll-behavior: smooth;
     }
 
     .main {
-        scroll-behavior: auto;
+        scroll-behavior: smooth;
     }
 }
 
-/* Smooth scroll enhancement for all elements */
+/* Custom scrollbar styling */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -355,7 +356,7 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 16px;
     box-shadow: 0 8px 32px var(--shadow);
-    transition: all 0.3s ease;
+    transition: all 0.3s easeInOutSine;
 }
 
 .nav-brand h1 {
@@ -470,11 +471,48 @@ body {
     padding-left: 5%;
 }
 
+.hero-content {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    margin-bottom: 20px;
+}
+
+.hero-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 3%;
+    object-fit: cover;
+    border: 3px solid var(--primary-accent);
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+}
+
+.hero-avatar:hover {
+    transform: scale(1.05);
+    border-color: var(--text-color);
+}
+
 .hero-title {
-    font-size: 2rem;
+    font-size: 5rem;
     font-weight: 400;
     letter-spacing: 2px;
-    margin-bottom: 20px;
+    margin: 0;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: color 0.3s ease;
+}
+
+.hero-subtitle {
+    font-size: 0.9rem;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
+    max-width: 600px;
+    line-height: 1.6;
     opacity: 1 !important;
     transform: translateY(0) !important;
     transition: color 0.3s ease;
@@ -555,11 +593,21 @@ body {
     border: none;
     border-radius: 0;
     overflow: visible;
-    transition: none;
+    transition: transform 0.3s ease-out;
     cursor: pointer;
     display: block !important;
     visibility: visible !important;
     position: relative;
+}
+
+.portfolio-item:focus {
+    outline: 2px solid var(--primary-accent);
+    outline-offset: 4px;
+}
+
+.portfolio-item:focus .portfolio-image img {
+    transform: scale(1.05);
+    filter: brightness(1.02);
 }
 
 .portfolio-image {
@@ -580,7 +628,16 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: none;
+    transition:
+        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 0.3s ease-out;
+    transform-origin: center center;
+    will-change: transform;
+}
+
+.portfolio-item:hover .portfolio-image img {
+    transform: scale(1.1);
+    filter: brightness(1.05);
 }
 
 .portfolio-content {
@@ -813,6 +870,18 @@ body {
         padding-left: 5%;
     }
 
+    .hero-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .hero-avatar {
+        width: 60px;
+        height: 60px;
+        border-width: 2px;
+    }
+
     .hero-title {
         font-size: 1.6rem;
         letter-spacing: 1px;
@@ -888,6 +957,13 @@ body {
 
     .portfolio-item {
         cursor: pointer;
+    }
+
+    /* 在移動設備上使用更輕微的觸摸反饋 */
+    .portfolio-item:hover .portfolio-image img,
+    .portfolio-item:active .portfolio-image img {
+        transform: scale(1.02);
+        filter: brightness(1.02);
     }
 
     .modal-close {
