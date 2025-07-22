@@ -9,6 +9,9 @@ let mouseY = 0;
 let followerX = 0;
 let followerY = 0;
 
+// Smooth scroll variables
+let isScrolling = false;
+
 // 平滑跟隨動畫函數
 function animateFollower() {
   const diffX = mouseX - followerX;
@@ -130,6 +133,30 @@ window.addEventListener("load", function () {
   }
 });
 
+// Enhanced smooth scrolling function
+function smoothScrollTo(target, duration = 500) {
+  const targetPosition = target.offsetTop;
+  const startPosition = window.pageYOffset;
+  const distance = targetPosition - startPosition;
+  let startTime = null;
+
+  function animation(currentTime) {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const run = ease(timeElapsed, startPosition, distance, duration);
+    window.scrollTo(0, run);
+    if (timeElapsed < duration) requestAnimationFrame(animation);
+  }
+
+  // Better easing curve - cubic-bezier(0.25, 0.46, 0.45, 0.94)
+  function ease(t, b, c, d) {
+    t /= d;
+    return c * (t * t * t * (t * (t * 6 - 15) + 10)) + b;
+  }
+
+  requestAnimationFrame(animation);
+}
+
 // 導航連結功能
 document.addEventListener("DOMContentLoaded", function () {
   // 導航連結平滑滾動
@@ -140,10 +167,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const targetElement = document.querySelector(targetId);
 
       if (targetElement) {
-        targetElement.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
+        isScrolling = true;
+        smoothScrollTo(targetElement);
+        setTimeout(() => {
+          isScrolling = false;
+        }, 500);
       }
     });
   });
@@ -210,5 +238,49 @@ document.addEventListener("htmx:responseError", function (e) {
   console.error("HTMX Request Error:", e.detail);
   e.target.innerHTML = '<div class="loading">載入失敗，請重新整理頁面</div>';
 });
+
+// Add smooth scrolling for mouse wheel with better responsiveness
+let scrollTimeout;
+let isWheelScrolling = false;
+
+document.addEventListener(
+  "wheel",
+  function (e) {
+    if (isScrolling) return;
+
+    e.preventDefault();
+
+    if (!isWheelScrolling) {
+      isWheelScrolling = true;
+      const delta = e.deltaY;
+      const scrollTop = window.pageYOffset;
+      const scrollAmount =
+        Math.abs(delta) > 100
+          ? delta > 0
+            ? 300
+            : -300
+          : delta > 0
+            ? 150
+            : -150;
+      const targetScroll = scrollTop + scrollAmount;
+
+      window.scrollTo({
+        top: Math.max(
+          0,
+          Math.min(
+            document.body.scrollHeight - window.innerHeight,
+            targetScroll,
+          ),
+        ),
+        behavior: "smooth",
+      });
+
+      setTimeout(() => {
+        isWheelScrolling = false;
+      }, 50);
+    }
+  },
+  { passive: false },
+);
 
 console.log("App.js setup complete");

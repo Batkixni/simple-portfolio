@@ -50,6 +50,7 @@ app.get("/api/works/:category", async (req, res) => {
         category: category,
         path: `${category}/${path.parse(file).name}`,
         order: parsed.attributes.order,
+        date: parsed.attributes.date || "",
       };
 
       works.push(work);
@@ -75,8 +76,7 @@ app.get("/api/works/:category", async (req, res) => {
                 </div>
                 <div class="portfolio-content">
                     <h3 class="portfolio-title">${work.title}</h3>
-                    <p class="portfolio-description">${work.description}</p>
-                    <a href="#" class="portfolio-link">查看詳情</a>
+                    <span class="portfolio-year">${work.date ? new Date(work.date).getFullYear() : ""}</span>
                 </div>
             </div>
         `,
